@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Toast;
-import android.widget.Spinner;
+import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button bluetoothButton, deviceButton;
     MainActivity mainActivity;
+    ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,16 +53,15 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<String> listNames = new ArrayList<>();
                 for (BluetoothDevice blueDevice : devices) {                                        // Affiche les appareils appairés
                     Toast.makeText(MainActivity.this, "Device = " + blueDevice.getName(), Toast.LENGTH_SHORT).show();
-                    listNames.add(blueDevice.getName());
+                    listNames.add(blueDevice.getName()+"\n");
                 }
                 //Getting the instance of Spinner and applying OnItemSelectedListener on it
-                Spinner spin = (Spinner) findViewById(R.id.devicesSpinner);
-                spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                mListView = (ListView) findViewById(R.id.deviceList);
+                mListView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
                     }
-
                     @Override
                     public void onNothingSelected(AdapterView<?> adapterView) {
 
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 ArrayAdapter aa = new ArrayAdapter(mainActivity,android.R.layout.simple_spinner_item,listNames);
                 aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 //Setting the ArrayAdapter data on the Spinner
-                spin.setAdapter(aa);
+                mListView.setAdapter(aa);
             }
         });
 
