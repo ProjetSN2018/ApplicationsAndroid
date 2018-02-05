@@ -7,10 +7,15 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ListView;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.BroadcastReceiver;
+
+import android.app.Fragment;
+
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -19,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button bluetoothButton, deviceButton;
     MainActivity mainActivity;
+
     ListView mListView;
 
     @Override
@@ -55,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Device = " + blueDevice.getName(), Toast.LENGTH_SHORT).show();
                     listNames.add(blueDevice.getName()+"\n");
                 }
+
+
                 //Getting the instance of Spinner and applying OnItemSelectedListener on it
                 mListView = (ListView) findViewById(R.id.deviceList);
                 mListView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
