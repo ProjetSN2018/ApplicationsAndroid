@@ -38,15 +38,19 @@ public class MainActivity extends AppCompatActivity {
 
                 switch(state){
                     case BluetoothAdapter.STATE_OFF:
+                        Toast.makeText(getApplicationContext(), "onReceive: STATE OFF", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "onReceive: STATE OFF");
                         break;
                     case BluetoothAdapter.STATE_TURNING_OFF:
+                        Toast.makeText(getApplicationContext(), "onReceive: STATE TURNING OFF", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "onReceive: STATE TURNING OFF");
                         break;
                     case BluetoothAdapter.STATE_ON:
+                        Toast.makeText(getApplicationContext(), "onReceive: STATE ON", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "onReceive: STATE ON");
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
+                        Toast.makeText(getApplicationContext(), "onReceive: STATE TURNING ON", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "onReceive: STATE TURNING ON");
                         break;
                 }
@@ -65,24 +69,31 @@ public class MainActivity extends AppCompatActivity {
 
                 switch(mode){
                     case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
+                        Toast.makeText(getApplicationContext(), "mBroadcasterReceiver2 : Discoverability Enabled.", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "mBroadcasterReceiver2 : Discoverability Enabled.");
                         break;
                     case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
+                        Toast.makeText(getApplicationContext(), "mBroadcasterReceiver2 : Able to receive connections.", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "mBroadcasterReceiver2 : Able to receive connections.");
                         break;
                     case BluetoothAdapter.SCAN_MODE_NONE:
+                        Toast.makeText(getApplicationContext(), "mBroadcasterReceiver2 : Not able to receive connections.", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "mBroadcasterReceiver2 : Not able to receive connections.");
                         break;
                     case BluetoothAdapter.STATE_CONNECTING:
+                        Toast.makeText(getApplicationContext(), "mBroadcasterReceiver2 : Connecting...", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "mBroadcasterReceiver2 : Connecting...");
                         break;
                     case BluetoothAdapter.STATE_CONNECTED:
+                        Toast.makeText(getApplicationContext(), "mBroadcasterReceiver2 : Connected.", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "mBroadcasterReceiver2 : Connected.");
                         break;
                 }
             }
         }
     };
+
+
     private BroadcastReceiver mBroadcastReceiver3 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -101,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy(){
+        Toast.makeText(getApplicationContext(), "onDestroy: called.", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onDestroy: called.");
         super.onDestroy();
         unregisterReceiver(mBroadcastReceiver1);
@@ -113,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Button btnOnOff = (Button) findViewById(R.id.btnOnOff);
         btnEnableDisable_Discovery = (Button) findViewById(R.id.btnDiscoverable);
-
+        lvNewDevices = (ListView)findViewById(R.id.lvNewDevices);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         btnOnOff.setOnClickListener(new View.OnClickListener(){
@@ -127,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void enableDisableBT(){
         if(mBluetoothAdapter == null){
+            Toast.makeText(getApplicationContext(), "enableDisableBT: Device doesn't have Bluetooth", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "enableDisableBT: Device doesn't have Bluetooth");
         }
         if(!mBluetoothAdapter.isEnabled()){
@@ -147,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void btnEnableDisable_Discoverable(View view){
         Log.d(TAG, "btnEnableDisable_Discoverable: Making device discoverable for 300 seconds.");
-
+        Toast.makeText(getApplicationContext(), "btnEnableDisable_Discoverable: Making device discoverable for 300 seconds.", Toast.LENGTH_SHORT).show();
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION,300);
         startActivity(discoverableIntent);
@@ -160,9 +173,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void btnDiscover(View view) {
         Log.d(TAG, "btnDiscover : Looking for unpaired devices.");
+        Toast.makeText(getApplicationContext(), "btnDiscover : Looking for unpaired devices.", Toast.LENGTH_SHORT).show();
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
-
+            Toast.makeText(getApplicationContext(), "btnDiscover : Cancelling discovery.", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "btnDiscover : Cancelling discovery.");
             checkBTPermissions();
 
             mBluetoothAdapter.startDiscovery();
