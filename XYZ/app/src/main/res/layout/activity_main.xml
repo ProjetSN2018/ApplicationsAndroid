@@ -27,7 +27,6 @@
         app:layout_constraintStart_toEndOf="@+id/btnOnOff"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <Button
         android:id="@+id/btnDiscover"
         android:layout_width="167dp"
@@ -38,7 +37,6 @@
         android:text="Discover"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <ListView
         android:id="@+id/lvNewDevices"

@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
 
     Button bluetoothButton, deviceButton;
     MainActivity mainActivity;
-
     ListView mListView;
 
     @Override
