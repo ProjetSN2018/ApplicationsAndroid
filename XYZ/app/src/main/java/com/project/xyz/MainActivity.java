@@ -1,8 +1,10 @@
 package com.project.xyz;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -125,14 +127,30 @@ public class MainActivity extends AppCompatActivity {
         btnOnOff.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                //Log.d(TAG, "onClick : enabling/disabling Bluetooth.");
                 enableDisableBT();
             }
         });
         lvNewDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getApplicationContext(), ((TextView) view).getText(), Toast.LENGTH_SHORT).show();
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                //Yes button clicked
+                                Intent authenticationIntent = new Intent(MainActivity.this, AuthenticationActivity.class);
+                                startActivity(authenticationIntent);
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+                AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+                builder.setMessage("Do you want to connect to this device :\n"+((TextView) view).getText()+" ?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
             }
         });
     }
@@ -151,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
             mBluetoothAdapter.disable();
             IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
             registerReceiver(mBroadcastReceiver1, BTIntent);
-
         }
     }
 
@@ -187,13 +204,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkBTPermissions(){
-//        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
-//            int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE LOCATION");
-//            permissionCheck += this.checkSelfPermission("Manifest.permission.ACCESS_FINE LOCATION");
-//            if (permissionCheck !=0){
-//                this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},1001);
-//            }
-//        }
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},1);
         }
