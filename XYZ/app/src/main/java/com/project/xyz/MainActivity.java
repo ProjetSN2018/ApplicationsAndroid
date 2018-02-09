@@ -208,5 +208,9 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},1);
         }
     }
+
+    public static int pow(int value){
+        return value*value;
+    }
 }
 

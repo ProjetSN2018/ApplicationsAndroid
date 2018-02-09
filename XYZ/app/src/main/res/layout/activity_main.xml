@@ -10,8 +10,8 @@
         android:id="@+id/btnOnOff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:text="ON/OFF"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,8 +20,8 @@
         android:id="@+id/btnDiscoverable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
         android:onClick="btnEnableDisable_Discoverable"
         android:text="Enable Discoverable"
         app:layout_constraintStart_toEndOf="@+id/btnOnOff"
@@ -32,7 +32,7 @@
         android:layout_width="167dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="76dp"
+        android:layout_marginTop="64dp"
         android:onClick="btnDiscover"
         android:text="Discover"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,8 +49,21 @@
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnDiscoverable"
-        app:layout_constraintVertical_bias="0.923" />
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/tvDeviceList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Device List :"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/lvNewDevices"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnDiscover" />
 
 </android.support.constraint.ConstraintLayout>
