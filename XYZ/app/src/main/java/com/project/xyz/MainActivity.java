@@ -2,7 +2,6 @@ package com.project.xyz;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -13,6 +12,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ListView;
@@ -24,12 +24,22 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG ="MainActivity";
 
     BluetoothAdapter mBluetoothAdapter;
     Button btnEnableDisable_Discovery;
+
+    BluetoothConnectionService mBluetoothConnection;
+
+    Button btnStartConnect;
+    Button btnSend;
+    EditText etMessage;
+
+    private static final UUID SECURED_UUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+
     public ArrayList<String> mBTDevices = new ArrayList<>();
     ListView lvNewDevices;
     MainActivity mainActivity;
@@ -124,6 +134,9 @@ public class MainActivity extends AppCompatActivity {
         btnEnableDisable_Discovery = (Button) findViewById(R.id.btnDiscoverable);
         lvNewDevices = (ListView)findViewById(R.id.lvNewDevices);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        btnStartConnect = (Button) findViewById(R.id.btnStartConnect);
+        btnSend = (Button) findViewById(R.id.btnSend);
+        etMessage = (EditText) findViewById(R.id.etMessage);
         btnOnOff.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -154,6 +167,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void startBTConnection(BluetoothDevice device, UUID uuid){
+        
+    }
+
     public void enableDisableBT(){
         if(mBluetoothAdapter == null){
             Toast.makeText(getApplicationContext(), "This Device doesn't have Bluetooth", Toast.LENGTH_SHORT).show();
