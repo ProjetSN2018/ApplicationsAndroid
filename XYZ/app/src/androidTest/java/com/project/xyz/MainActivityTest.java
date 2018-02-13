@@ -12,9 +12,9 @@ public class MainActivityTest extends TestCase{
         int result = mainActivity.pow(5);
         assertEquals(25,result);
     }
-    @Test
-    public void testPow2(){
-        int result = mainActivity.pow(5);
-        assertEquals(24,result);
-    }
+//    @Test
+//    public void testPow2(){
+//        int result = mainActivity.pow(5);
+//        assertEquals(24,result);
+//    }
 }
