@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +36,7 @@ public class BluetoothConnectionService {
     public BluetoothConnectionService(Context context){
         mContext = context;
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        start();
     }
 
     private class AcceptThread extends Thread {
@@ -167,7 +169,11 @@ public class BluetoothConnectionService {
             OutputStream tmpOut = null;
 
             // Dismiss the progress dialog when connection is established
-            mProgressDialog.dismiss();
+            try{
+                mProgressDialog.dismiss();
+            }catch(NullPointerException e){
+                Log.e(TAG,"No progressDialog to dismiss");
+            }
 
             try {
                 tmpIn = mmSocket.getInputStream();
@@ -175,6 +181,8 @@ public class BluetoothConnectionService {
             } catch (IOException e) {
                 Log.e(TAG, "Couldn't get input and/or output stream");
             }
+
+
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
         }
@@ -187,7 +195,8 @@ public class BluetoothConnectionService {
             while(true){
                 try {
                     bytes = mmInStream.read(buffer);
-                    //String incomingMessage = new String(buffer, 0, bytes);
+                    String incomingMessage = new String(buffer, 0, bytes);
+                    Log.d(TAG,"IncomingMessage: " + incomingMessage);
                 } catch (IOException e) {
                     Log.e(TAG, "Couldn't read the Inputstream");
                     break;
@@ -215,7 +224,7 @@ public class BluetoothConnectionService {
 
     private void connected(BluetoothSocket mmSocket,BluetoothDevice mmDevice){
         mConnectedThread = new ConnectedThread(mmSocket);
-        mConnectThread.start();
+        //mConnectThread.start();
     }
 
     /**

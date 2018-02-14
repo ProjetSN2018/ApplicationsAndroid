@@ -24,6 +24,8 @@ import android.util.Log;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -35,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     BluetoothConnectionService mBluetoothConnection;
 
-    Button btnStartConnect;
     Button btnSend;
     EditText etMessage;
     BluetoothDevice mBTDevice;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     case BluetoothAdapter.STATE_TURNING_OFF:
                         Log.d(TAG, "onReceive: STATE TURNING OFF");
                         Toast.makeText(getApplicationContext(), "Bluetooth has been disabled.", Toast.LENGTH_SHORT).show();
-                        //mBTDevices.clear();
+                        mBTDevices.clear();
                         mBTDevicesList.clear();
                         ArrayAdapter adapter = new ArrayAdapter(mainActivity,android.R.layout.simple_list_item_1,mBTDevices);
                         lvNewDevices.setAdapter(adapter);
@@ -114,9 +115,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if(!mBTDevices.contains(device.getName()+"\n"+device.getAddress())) {
                     mBTDevices.add(device.getName()+"\n"+device.getAddress());
+                    ArrayAdapter adapter = new ArrayAdapter(mainActivity,android.R.layout.simple_list_item_1,mBTDevices);
+                    lvNewDevices.setAdapter(adapter);
                     mBTDevicesList.add(device);
                 }
-
             }
         }
     };
@@ -163,7 +165,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnEnableDisable_Discovery = (Button) findViewById(R.id.btnDiscoverable);
         lvNewDevices = (ListView)findViewById(R.id.lvNewDevices);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        btnStartConnect = (Button) findViewById(R.id.btnStartConnect);
         btnSend = (Button) findViewById(R.id.btnSend);
         etMessage = (EditText) findViewById(R.id.etMessage);
         lvNewDevices.setOnItemClickListener(MainActivity.this);
@@ -174,6 +175,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View view) {
                 enableDisableBT();
+            }
+        });
+
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                byte[] bytes = etMessage.getText().toString().getBytes(Charset.defaultCharset());
+                mBluetoothConnection.write(bytes);
+                etMessage.getText().clear();
             }
         });
     }
@@ -223,6 +233,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void btnDiscover(View view) {
         Log.d(TAG, "btnDiscover: Looking for unpaired devices.");
 
+        mBTDevices.clear();
+        mBTDevicesList.clear();
+        ArrayAdapter adapter = new ArrayAdapter(mainActivity,android.R.layout.simple_list_item_1,mBTDevices);
+        lvNewDevices.setAdapter(adapter);
+
         if(mBluetoothAdapter.isDiscovering()){
             mBluetoothAdapter.cancelDiscovery();
             Log.d(TAG, "btnDiscover: Canceling discovery.");
@@ -267,7 +282,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //create the bond.
         //NOTE: Requires API 17+? I think this is JellyBean
-
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -276,15 +290,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         //Yes button clicked
                         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2){
                             Log.d(TAG, "Trying to pair with " + deviceName);
-
+                            Toast.makeText(getApplicationContext(), "Trying to pair with " + deviceName, Toast.LENGTH_SHORT).show();
                             mBTDevicesList.get(i).createBond();
                             mBTDevice = mBTDevicesList.get(i);
                             mBluetoothConnection = new BluetoothConnectionService(MainActivity.this);
+
+                            startConnection();
                         }
 
-
-                        Intent authenticationIntent = new Intent(MainActivity.this, AuthenticationActivity.class);
-                        startActivity(authenticationIntent);
+//                        Intent authenticationIntent = new Intent(MainActivity.this, AuthenticationActivity.class);
+//                        startActivity(authenticationIntent);
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
