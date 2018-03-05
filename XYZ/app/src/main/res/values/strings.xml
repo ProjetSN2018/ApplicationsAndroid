@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">XYZ</string>
+    <string name="str_btnOnOff">ON/OFF</string>
+    <string name="str_btnDiscoverable">Enable discoverable</string>
+    <string name="str_btnDiscover">Start discovery</string>
+    <string name="str_btnNextAct">Next activity</string>
+    <string name="str_tvDeviceList">Device List</string>
+    <string name="str_btnSend">Send</string>
+    <string name="str_btnBack">Back</string>
+    <string name="str_btnConnect">Connect</string>
 </resources>

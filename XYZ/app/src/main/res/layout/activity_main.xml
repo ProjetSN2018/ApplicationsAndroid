@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/myActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.project.xyz.MainActivity">
@@ -10,9 +11,9 @@
         android:id="@+id/btnOnOff"
         android:layout_width="167dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="ON/OFF"
+        android:text="@string/str_btnOnOff"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,20 +24,35 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:onClick="btnEnableDisable_Discoverable"
-        android:text="Enable Discoverable"
+        android:text="@string/str_btnDiscoverable"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btnOnOff"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!--android:onClick="btnEnableDisable_Discoverable"-->
+
+
+    <Button
+        android:id="@+id/btnNextAct"
+        android:layout_width="179dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:onClick="btnEnableDisable_Discoverable"
+        android:text="@string/str_btnNextAct"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.571"
+        app:layout_constraintStart_toEndOf="@+id/btnOnOff"
+        app:layout_constraintTop_toBottomOf="@+id/btnDiscoverable" />
 
     <Button
         android:id="@+id/btnDiscover"
         android:layout_width="167dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="64dp"
         android:onClick="btnDiscover"
-        android:text="Discover"
+        android:text="@string/str_btnDiscover"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -47,19 +63,18 @@
         android:layout_below="@id/btnDiscover"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnDiscoverable" />
+        app:layout_constraintTop_toBottomOf="@+id/btnNextAct" />
 
     <TextView
         android:id="@+id/tvDeviceList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
-        android:text="Device List :"
+        android:text="@string/str_tvDeviceList"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/lvNewDevices"
         app:layout_constraintStart_toStartOf="parent"
@@ -69,9 +84,9 @@
         android:id="@+id/btnSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginRight="24dp"
-        android:text="Send"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="28dp"
+        android:text="@string/str_btnSend"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
