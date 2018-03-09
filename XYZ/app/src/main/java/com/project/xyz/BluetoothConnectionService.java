@@ -7,7 +7,11 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +26,7 @@ import java.util.UUID;
 public class BluetoothConnectionService {
     private static final String TAG = "BluetoothConnectionServ";
     private static final String appName = "XYZ";
-    private static final UUID SECURE_UUID = UUID.fromString("2bf5a2a6-1657-49da-8371-01c2cba68832");
+    private static final UUID INSECURE_UUID = UUID.fromString("a60a008b-049b-4e67-a9ea-b52a0c9207d7");
     private final BluetoothAdapter mBluetoothAdapter;
     Context mContext;
     private AcceptThread mSecureAcceptThread;
@@ -32,6 +36,8 @@ public class BluetoothConnectionService {
     ProgressDialog mProgressDialog;
 
     private ConnectedThread mConnectedThread;
+
+    TextView tvReceiveMessage;
 
     public BluetoothConnectionService(Context context){
         mContext = context;
@@ -50,9 +56,9 @@ public class BluetoothConnectionService {
 
             //Creating a new listening server socket
             try{
-                tmp = mBluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(appName, SECURE_UUID);
+                tmp = mBluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(appName, INSECURE_UUID);
 
-                Log.d(TAG, "AcceptThread: Setting up server using:" + SECURE_UUID);
+                Log.d(TAG, "AcceptThread: Setting up server using:" + INSECURE_UUID);
             }catch(IOException e){
                 Log.e(TAG,"IOException : "+ e.getMessage());
             }
@@ -119,7 +125,7 @@ public class BluetoothConnectionService {
                 } catch (IOException e1) {
                     Log.e(TAG,"Unable to close connection in socket : "+ e.getMessage());
                 }
-                Log.d(TAG,"Couldn't connect to the UUID: "+ SECURE_UUID);
+                Log.d(TAG,"Couldn't connect to the UUID: "+ INSECURE_UUID);
             }
             connected(mmSocket, mmDevice);
         }
@@ -204,9 +210,8 @@ public class BluetoothConnectionService {
             int bytes; // Bytes returned from read()
             // Keep listening to the InputStream until an exception occurs
             while(true){
-                Toast.makeText(mContext, "Bluetooth has been disabled.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Oulala", Toast.LENGTH_SHORT).show();
                 try {
-
                     bytes = mmInStream.read(buffer);
                     String incomingMessage = new String(buffer, 0, bytes);
                     Log.d(TAG,"IncomingMessage: " + incomingMessage);
@@ -225,7 +230,7 @@ public class BluetoothConnectionService {
             try {
                 mmOutStream.write(bytes);
             } catch (IOException e) {
-                Log.e(TAG,"Couldn't write in the Outputstream"+ e.getMessage());
+                Log.e(TAG,"Couldn't write in the OutputStream"+ e.getMessage());
             }
         }
         // Call this from the main activity to shutdown the connection

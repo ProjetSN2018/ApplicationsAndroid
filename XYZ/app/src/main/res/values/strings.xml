@@ -8,4 +8,9 @@
     <string name="str_btnSend">Send</string>
     <string name="str_btnBack">Back</string>
     <string name="str_btnConnect">Connect</string>
+    <string name="str_tvNotConnected">Not connected</string>
+    <string name="str_tvConnecting">Connecting</string>
+    <string name="str_tvConnected">Connected</string>
+    <string name="str_tvState">State :</string>
+
 </resources>

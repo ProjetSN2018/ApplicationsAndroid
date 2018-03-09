@@ -43,8 +43,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     BluetoothDevice mBTDevice;
     ListView lvNewDevices;
     MainActivity mainActivity;
+    TextView tvState;
 
-    private static final UUID SECURE_UUID = UUID.fromString("2bf5a2a6-1657-49da-8371-01c2cba68832");
+    private static final UUID INSECURE_UUID = UUID.fromString("a60a008b-049b-4e67-a9ea-b52a0c9207d7");
 
     public ArrayList<String> mBTDevices = new ArrayList<>();
     public ArrayList<BluetoothDevice> mBTDevicesList = new ArrayList<>();
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnSend = (Button) findViewById(R.id.btnSend);
         btnNextAct = (Button) findViewById(R.id.btnNextAct);
         etMessage = (EditText) findViewById(R.id.etMessage);
-
+        tvState = (TextView) findViewById(R.id.tvStatus);
         lvNewDevices.setOnItemClickListener(MainActivity.this);
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
            @Override
            public void onClick(View view) {
                btnEnableDisable_Discoverable(view);
+               tvState.setText(R.string.str_tvConnected);
            }
         });
     }
@@ -118,10 +120,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, mBluetoothAdapter.ERROR);
                 switch(state){
                     case BluetoothAdapter.STATE_OFF:
-                        Log.d(TAG, "onReceive: STATE OFF");
+                        Log.d(TAG, "mBroadcasterReceiver1: STATE OFF");
                         break;
                     case BluetoothAdapter.STATE_TURNING_OFF:
-                        Log.d(TAG, "onReceive: STATE TURNING OFF");
+                        Log.d(TAG, "mBroadcasterReceiver1: STATE TURNING OFF");
                         Toast.makeText(getApplicationContext(), "Bluetooth has been disabled.", Toast.LENGTH_SHORT).show();
                         mBTDevices.clear();
                         mBTDevicesList.clear();
@@ -129,10 +131,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         lvNewDevices.setAdapter(adapter);
                         break;
                     case BluetoothAdapter.STATE_ON:
-                        Log.d(TAG, "onReceive: STATE ON");
+                        Log.d(TAG, "mBroadcasterReceiver1: STATE ON");
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
-                        Log.d(TAG, "onReceive: STATE TURNING ON");
+                        Log.d(TAG, "mBroadcasterReceiver1: STATE TURNING ON");
                         break;
                 }
             }
@@ -220,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     public void startConnection(){
-        startBTConnection(mBTDevice,SECURE_UUID);
+        startBTConnection(mBTDevice,INSECURE_UUID);
     }
 
     public void startBTConnection(BluetoothDevice device, UUID uuid){
