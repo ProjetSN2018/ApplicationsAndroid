@@ -5,12 +5,4 @@
         android:title="Turn Bluetooth On/Off"
         android:id="@+id/bluetoothOnOff"/>
 
-    <item
-        android:title="Exemple2"
-        android:id="@+id/exemple_id2"/>
-
-    <item
-        android:title="Exemple3"
-        android:id="@+id/exemple_id3"/>
-
 </menu>
