@@ -9,7 +9,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -40,13 +42,9 @@ public class DeviceListActivity extends Activity {
     /**
      * Return Intent extra
      */
-    public static String EXTRA_DEVICE_ADDRESS = "device_address";
-
 
     // Member fields
-
     private BluetoothAdapter mBtAdapter;
-
 
     //Newly discovered devices
     private ArrayAdapter<String> mNewDevicesArrayAdapter;
@@ -111,6 +109,7 @@ public class DeviceListActivity extends Activity {
         if (pairedDevices.size() > 0) {
             findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);
             for (BluetoothDevice device : pairedDevices) {
+//                pairedDevices.add(device);
                 pairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
             }
         } else {
@@ -165,12 +164,9 @@ public class DeviceListActivity extends Activity {
         }
         //If the device isn't discovering, start discovery
         if (!mBtAdapter.isDiscovering()) {
-            Toast.makeText(getApplicationContext(), "Is not discovering", Toast.LENGTH_SHORT).show();
-
             //check BT permissions in manifest
             checkBTPermissions();
             mBtAdapter.startDiscovery();
-            Toast.makeText(getApplicationContext(), "startDiscovery.", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "startDiscovery");
 
             IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -187,30 +183,30 @@ public class DeviceListActivity extends Activity {
             Log.d(TAG, "----------------------------------onItemClick()");
             // Cancel discovery because it's costly and we're about to connect
             mBtAdapter.cancelDiscovery();
-
+            // BluetoothDevice device = mBTDevicesList.get(arg2);
             // Get the device MAC address, which is the last 17 chars in the View
+
             String info = ((TextView) v).getText().toString();
-            String address = info.substring(info.length() - 17);
-
             // Create the result Intent and include the MAC address
-            Intent intent = new Intent();
-            intent.putExtra(EXTRA_DEVICE_ADDRESS, address);
-
-            Log.d(TAG, "----------------------------------" + info);
-            Toast.makeText(getApplicationContext(), info, Toast.LENGTH_SHORT).show();
-
-            // Set result and finish this Activity
-            setResult(Activity.RESULT_OK, intent);
 
             // If clicked item is not a device
-            if      ((info != getResources().getText(R.string.none_found).toString())||
-                    (info != getResources().getText(R.string.none_paired).toString()))
+            if      ((info == getResources().getText(R.string.none_found).toString())||
+                    (info == getResources().getText(R.string.none_paired).toString()))
             {
-                Log.d(TAG, getResources().getText(R.string.none_found).toString()
-                        +"or"
-                        +getResources().getText(R.string.none_paired).toString());
-            }else{
 
+                Log.d(TAG, getResources().getText(R.string.none_found).toString()
+                        +" or "
+                        +getResources().getText(R.string.none_paired).toString());
+            }
+            else{
+                Log.d(TAG, "----------------------------------\n" + info);
+                Toast.makeText(getApplicationContext(), info, Toast.LENGTH_SHORT).show();
+                Intent DoorManagementIntent = new Intent(DeviceListActivity.this, DoorManagementActivity.class);
+                DoorManagementIntent.putExtra("device_info",info);
+                if (av != pairedListView) {
+                    DoorManagementIntent.putExtra("device", mBTDevicesList.get(arg2));
+                }
+                startActivity(DoorManagementIntent);
             }
         }
     };

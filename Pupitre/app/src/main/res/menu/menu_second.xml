@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="Mode 1"
+        android:id="@+id/mode1"/>
+
+    <item
+        android:title="Mode 2"
+        android:id="@+id/mode2"/>
+
+    <item
+        android:title="Mode 3"
+        android:id="@+id/mode3"/>
+
+    <item
+        android:title="Mode 4"
+        android:id="@+id/mode4"/>
+
+</menu>

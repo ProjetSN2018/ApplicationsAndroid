@@ -59,9 +59,19 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     Toast.makeText(getApplicationContext(), "Bluetooth must be turned on.", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
+
+        int a=10;
+        switch (a){
+            case 10:
+                Log.d(TAG, "case 10");
+                a=12;
+                break;
+            case 12:
+                Log.d(TAG, "case 12");
+                break;
+        }
     }
 
     //Displays menu created in menu_main.xml
@@ -81,6 +91,9 @@ public class MainActivity extends AppCompatActivity {
             //"Turn Bluetooth On/Off was clicked
             case R.id.bluetoothOnOff:
                 enableDisableBT();
+                break;
+            case R.id.makeDiscoverable:
+                makeDiscoverable();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -106,6 +119,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void makeDiscoverable(){
+        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+        startActivity(discoverableIntent);
+    }
+
     private final BroadcastReceiver mBroadcastReceiverBluetoothOnOff = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent){
             String action = intent.getAction();
@@ -126,6 +145,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-
-
 }

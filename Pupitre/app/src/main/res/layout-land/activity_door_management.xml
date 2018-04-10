@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:configChanges="orientation|keyboardHidden"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_second"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/lightBlue"
+        android:textColor="@color/white"
+        app:theme="@style/ThemeOverlay.AppCompat.Light">
+    </android.support.v7.widget.Toolbar>
+
+    <TextView
+        android:id="@+id/tvState"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/device_state"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/Draw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Draw"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn1"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"
+        android:background="@drawable/round_button"
+        android:fontFamily="@font/calibrib"
+        android:layout_marginTop="8dp"
+        android:width="50dp"
+        android:height="50dp"
+        android:text="Door 1" />
+
+    <Button
+        android:id="@+id/btn2"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/round_button"
+        android:fontFamily="@font/calibrib"
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        android:text="Door 2" />
+    <Button
+        android:id="@+id/btn3"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/round_button"
+        android:fontFamily="@font/calibrib"
+        android:visibility="gone"
+        android:text="Door 3" />
+    <Button
+        android:id="@+id/btn4"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/round_button"
+        android:fontFamily="@font/calibrib"
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        android:text="Door 4" />
+    <Button
+        android:id="@+id/btn5"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/round_button"
+        android:fontFamily="@font/calibrib"
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        android:text="Door 5" />
+    <Button
+        android:id="@+id/btn6"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/round_button"
+        android:fontFamily="@font/calibrib"
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        android:text="Door 6" />
+    <Button
+        android:id="@+id/btn7"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/round_button"
+        android:fontFamily="@font/calibrib"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:text="Door 7" />
+
+    <Button
+        android:id="@+id/btn8"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@drawable/round_button"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"
+        android:fontFamily="@font/calibrib"
+        android:layout_marginTop="8dp"
+        android:text="Door 8" />
+
+    <EditText
+        android:id="@+id/etNbDoor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:ems="10"
+        android:inputType="number"
+        android:maxLength="1"
+        app:layout_constraintEnd_toStartOf="@+id/Draw"
+        app:layout_constraintHorizontal_bias="0.663"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</android.support.constraint.ConstraintLayout>

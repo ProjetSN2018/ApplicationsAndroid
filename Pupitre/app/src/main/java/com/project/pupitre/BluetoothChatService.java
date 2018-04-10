@@ -23,6 +23,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 
 import java.io.IOException;
@@ -150,6 +151,7 @@ public class BluetoothChatService {
             mConnectedThread = null;
         }
 
+        Log.d(TAG, "Connect to :\n" + device.getName()+ device.getAddress());
         // Start the thread to connect with the given device
         mConnectThread = new ConnectThread(device, secure);
         mConnectThread.start();

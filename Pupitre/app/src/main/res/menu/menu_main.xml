@@ -4,5 +4,7 @@
     <item
         android:title="Turn Bluetooth On/Off"
         android:id="@+id/bluetoothOnOff"/>
-
+    <item
+        android:title="Make discoverable"
+        android:id="@+id/makeDiscoverable"/>
 </menu>
