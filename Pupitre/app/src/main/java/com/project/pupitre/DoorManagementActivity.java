@@ -13,6 +13,9 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.hardware.Sensor;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,10 +27,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.OrientationEventListener;
+import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.ActionBar;
@@ -36,24 +43,32 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
 import java.util.Set;
+
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 
 public class DoorManagementActivity extends Activity {
     /**
      * Tag for Log
      */
     private static final String TAG = "DeviceListActivity";
-
+    OrientationEventListener myOrientationEventListener;
     DoorManagementActivity doorManagementActivity;
     TextView tvState;
     EditText etNbDoor;
     Button btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btnDraw;
+    ArrayList<Button> mBtnList = new ArrayList<>();
+    ProgressBar pbLoading;
     private BluetoothChatService mChatService = null;
     private BluetoothAdapter mBluetoothAdapter = null;
     private android.support.v7.widget.Toolbar secondToolbar;
-    private BluetoothAdapter mBtAdapter;
+    private Context mContext;
+    // private BluetoothAdapter mBtAdapter;
     private BluetoothDevice mBTDevice;
-
+    private static OrientationEventListener orientationListener;
+    int i;
 
     @SuppressLint("ResourceType")
     @Override
@@ -61,9 +76,8 @@ public class DoorManagementActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         // Setup the window
+        mContext = this;
         setContentView(R.layout.activity_door_management);
-
-        int value;
         btn1 = (Button) findViewById(R.id.btn1);
         btn2 = (Button) findViewById(R.id.btn2);
         btn3 = (Button) findViewById(R.id.btn3);
@@ -73,6 +87,16 @@ public class DoorManagementActivity extends Activity {
         btn7 = (Button) findViewById(R.id.btn7);
         btn8 = (Button) findViewById(R.id.btn8);
         btnDraw = (Button) findViewById(R.id.Draw);
+        pbLoading = (ProgressBar)findViewById(R.id.progressBar);
+
+        mBtnList.add(btn1);
+        mBtnList.add(btn2);
+        mBtnList.add(btn3);
+        mBtnList.add(btn4);
+        mBtnList.add(btn5);
+        mBtnList.add(btn6);
+        mBtnList.add(btn7);
+        mBtnList.add(btn8);
 
         etNbDoor = (EditText) findViewById(R.id.etNbDoor);
         tvState = (TextView) findViewById(R.id.tvState);
@@ -98,6 +122,52 @@ public class DoorManagementActivity extends Activity {
                 CreateButtons();
             }
         });
+
+        for (i=0;i<mBtnList.size();i++) {
+            final int current = i+1;
+            mBtnList.get(i).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext, "click detected on door "+current, Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "click detected on door "+current);
+                    sendMessage("OD"+i);
+                }
+            });
+        }
+
+        // Get device default display
+        //final Display display = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+
+        // Called when
+        orientationListener = new OrientationEventListener(
+                this, SensorManager.SENSOR_DELAY_NORMAL) {
+            @Override
+            public void onOrientationChanged(int angle) {
+                if (pbLoading.getVisibility() == View.GONE)CreateButtons();
+            }
+        };
+
+        if (orientationListener.canDetectOrientation()){
+            orientationListener.enable();
+        }
+        else{
+            Toast.makeText(this,
+                    "Can not Detect Orientation", Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("pbState", pbLoading.getVisibility());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        pbLoading.setVisibility(savedInstanceState.getInt("pbState"));
     }
 
     //Displays menu created in menu_main.xml
@@ -133,6 +203,7 @@ public class DoorManagementActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        orientationListener.disable();
         if (mChatService != null) {
             mChatService.stop();
         }
@@ -156,7 +227,7 @@ public class DoorManagementActivity extends Activity {
     private void sendMessage(String message) {
         // Check that we're actually connected before trying anything
         if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
-            Toast.makeText(doorManagementActivity, "Not Connected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Not Connected", Toast.LENGTH_SHORT).show();
             return;
         }
         // Check that there's actually something to send
@@ -223,362 +294,96 @@ public class DoorManagementActivity extends Activity {
         }
     };
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        // Checks the orientation of the screen
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Toast.makeText(this, "landscape", Toast.LENGTH_SHORT).show();
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            Toast.makeText(this, "portrait", Toast.LENGTH_SHORT).show();
-        }
-        CreateButtons();
-    }
-
     private void CreateButtons() {
-
-        String orientation = "";
         int value;
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         int width = size.x;
         int height = size.y;
-
-        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
-        float btnSize = 100 * (metrics.densityDpi / 160f);
+        int imp = 0;
 
         String strNbDoor = etNbDoor.getText().toString();
         int nbDoor = Integer.parseInt(strNbDoor);
 
+        int d = 0, i, j, nRow, nCol;
+
+
+        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+        float btnSize = 100 * (metrics.densityDpi / 160f);
+
+        if (nbDoor % 2 == 1) {
+            imp = 1;
+        }
+
+        etNbDoor.setVisibility(View.GONE);
+        btnDraw.setVisibility(View.GONE);
         value = this.getResources().getConfiguration().orientation;
 
-        if (value == Configuration.ORIENTATION_PORTRAIT) {
+        if (nbDoor>=1 && nbDoor<=8)pbLoading.setVisibility(View.GONE);
 
-            orientation = "Portrait";
+        if (value == ORIENTATION_PORTRAIT) {
+            nCol = (nbDoor == 1) ? 1 : 2;
+            nRow = (nbDoor / nCol);
+
+            if (nbDoor != 1) {
+                for (i = 0; i < nRow; i++) {
+                    for (j = 0; j < nCol; j++) {
+                        mBtnList.get(d).setVisibility(View.VISIBLE);
+                        mBtnList.get(d).setX(width / 3 * (j + 1) - btnSize / 2);
+                        mBtnList.get(d).setY(height / (nRow + 1 + imp) * (i + 1) - btnSize / 2);
+                        d++;
+                    }
+                }
+                if (nbDoor % 2 == 1) {
+                    mBtnList.get(d).setVisibility(View.VISIBLE);
+                    mBtnList.get(d).setX((width / 2) - btnSize / 2);
+                    mBtnList.get(d).setY(height / (nRow + 1) * i + 1);
+                }
+            }
         }
 
-        if (value == Configuration.ORIENTATION_LANDSCAPE) {
-
-            orientation = "Landscape";
+        if (value == ORIENTATION_LANDSCAPE) {
+            nRow = (nbDoor <= 3) ? 1 : 2;
+            if (nbDoor == 3) {
+                nCol = 3;
+            } else {
+                nCol = (nRow == 1) ? nbDoor : nbDoor / 2;
+            }
+            if (nbDoor != 1) {
+                for (i = 0; i < nRow; i++) {
+                    for (j = 0; j < nCol + ((nbDoor == 3) ? 0 : imp) - ((imp == 1 && i == 1) ? 1 : 0); j++) {
+                        mBtnList.get(d).setVisibility(View.VISIBLE);
+                        mBtnList.get(d).setX(width / (nCol + 1 + ((nbDoor == 3) ? 0 : imp)) * (j + 1) - btnSize / 2 + ((imp == 1) ? (i * (width / (nCol + 1 + ((nbDoor == 3) ? 0 : imp)))) / 2 : 0));
+                        mBtnList.get(d).setY(height / (nRow + 1) * (i + 1) - btnSize / 2);
+                        d++;
+                    }
+                }
+            }
         }
 
-        tvState.setText(" Current Screen Orientation = " + orientation);
-
-        if (orientation == "Landscape") {
-            switch (nbDoor) {
-                case 1:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 2 - btnSize / 2);
-                    btn1.setY(height / 2 - btnSize / 2);
-                    break;
-                case 2:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 3 - btnSize / 2);
-                    btn1.setY(height / 2 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 3 * 2 - btnSize / 2);
-                    btn2.setY(height / 2 - btnSize / 2);
-                    break;
-                case 3:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 4 - btnSize / 2);
-                    btn1.setY(height / 2 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 4 * 2 - btnSize / 2);
-                    btn2.setY(height / 2 - btnSize / 2);
-                    ///
-                    btn3.setVisibility(View.VISIBLE);
-                    btn3.setX(width / 4 * 3 - btnSize / 2);
-                    btn3.setY(height / 2 - btnSize / 2);
-                    break;
-                case 4:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 3 - btnSize / 2);
-                    btn1.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 3 * 2 - btnSize / 2);
-                    btn2.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn3.setVisibility(View.VISIBLE);
-                    btn3.setX(width / 3 - btnSize / 2);
-                    btn3.setY(height / 3 * 2 - btnSize / 2);
-                    ///
-                    btn4.setVisibility(View.VISIBLE);
-                    btn4.setX(width / 3 * 2 - btnSize / 2);
-                    btn4.setY(height / 3 * 2 - btnSize / 2);
-                    break;
-                case 5:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 4 - btnSize / 2);
-                    btn1.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 4 * 2 - btnSize / 2);
-                    btn2.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn3.setVisibility(View.VISIBLE);
-                    btn3.setX(width / 4 * 3 - btnSize / 2);
-                    btn3.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn4.setVisibility(View.VISIBLE);
-                    btn4.setX(width / 8 * 3 - btnSize / 2);
-                    btn4.setY(height / 3 * 2 - btnSize / 2);
-                    ///
-                    btn5.setVisibility(View.VISIBLE);
-                    btn5.setX(width / 8 * 5 - btnSize / 2);
-                    btn5.setY(height / 3 * 2 - btnSize / 2);
-                    break;
-                case 6:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 4 - btnSize / 2);
-                    btn1.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 4 * 2 - btnSize / 2);
-                    btn2.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn3.setVisibility(View.VISIBLE);
-                    btn3.setX(width / 4 * 3 - btnSize / 2);
-                    btn3.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn4.setVisibility(View.VISIBLE);
-                    btn4.setX(width / 4 - btnSize / 2);
-                    btn4.setY(height / 3 * 2 - btnSize / 2);
-                    ///
-                    btn5.setVisibility(View.VISIBLE);
-                    btn5.setX(width / 4 * 2 - btnSize / 2);
-                    btn5.setY(height / 3 * 2 - btnSize / 2);
-                    ///
-                    btn6.setVisibility(View.VISIBLE);
-                    btn6.setX(width / 4 * 3 - btnSize / 2);
-                    btn6.setY(height / 3 * 2 - btnSize / 2);
-                    break;
-                case 7:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 5 - btnSize / 2);
-                    btn1.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 5 * 2 - btnSize / 2);
-                    btn2.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn3.setVisibility(View.VISIBLE);
-                    btn3.setX(width / 5 * 3 - btnSize / 2);
-                    btn3.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn4.setVisibility(View.VISIBLE);
-                    btn4.setX(width / 5 * 4 - btnSize / 2);
-                    btn4.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn5.setVisibility(View.VISIBLE);
-                    btn5.setX(width / 10 * 3 - btnSize / 2);
-                    btn5.setY(height / 5 * 3 - btnSize / 2);
-                    ///
-                    btn6.setVisibility(View.VISIBLE);
-                    btn6.setX(width / 10 * 5 - btnSize / 2);
-                    btn6.setY(height / 5 * 3 - btnSize / 2);
-                    ///
-                    btn7.setVisibility(View.VISIBLE);
-                    btn7.setX(width / 10 * 7 - btnSize / 2);
-                    btn7.setY(height / 5 * 4 - btnSize / 2);
-                    break;
-                case 8:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 5 - btnSize / 2);
-                    btn1.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 5 * 2 - btnSize / 2);
-                    btn2.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn3.setVisibility(View.VISIBLE);
-                    btn3.setX(width / 5 * 3 - btnSize / 2);
-                    btn3.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn4.setVisibility(View.VISIBLE);
-                    btn4.setX(width / 5 * 4 - btnSize / 2);
-                    btn4.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn5.setVisibility(View.VISIBLE);
-                    btn5.setX(width / 5 - btnSize / 2);
-                    btn5.setY(height / 3 * 2 - btnSize / 2);
-                    ///
-                    btn6.setVisibility(View.VISIBLE);
-                    btn6.setX(width / 5 * 2 - btnSize / 2);
-                    btn6.setY(height / 3 * 2 - btnSize / 2);
-                    ///
-                    btn7.setVisibility(View.VISIBLE);
-                    btn7.setX(width / 5 * 3 - btnSize / 2);
-                    btn7.setY(height / 3 * 2 - btnSize / 2);
-                    ///
-                    btn8.setVisibility(View.VISIBLE);
-                    btn8.setX(width / 5 * 4 - btnSize / 2);
-                    btn8.setY(height / 3 * 2 - btnSize / 2);
-                    break;
-            }
-        } else {
-            switch (nbDoor) {
-                case 1:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 2 - btnSize / 2);
-                    btn1.setY(height / 2 - btnSize / 2);
-                    break;
-                case 2:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 2 - btnSize / 2);
-                    btn1.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 2 - btnSize / 2);
-                    btn2.setY(height / 3 * 2 - btnSize / 2);
-                    break;
-                case 3:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 2 - btnSize / 2);
-                    btn1.setY(height / 4 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 2 - btnSize / 2);
-                    btn2.setY(height / 4 * 2 - btnSize / 2);
-                    ///
-                    btn3.setVisibility(View.VISIBLE);
-                    btn3.setX(width / 2 - btnSize / 2);
-                    btn3.setY(height / 4 * 3 - btnSize / 2);
-                    break;
-                case 4:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 3 - btnSize / 2);
-                    btn1.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 3 * 2 - btnSize / 2);
-                    btn2.setY(height / 3 - btnSize / 2);
-                    ///
-                    btn3.setVisibility(View.VISIBLE);
-                    btn3.setX(width / 3 - btnSize / 2);
-                    btn3.setY(height / 3 * 2 - btnSize / 2);
-                    ///
-                    btn4.setVisibility(View.VISIBLE);
-                    btn4.setX(width / 3 * 2 - btnSize / 2);
-                    btn4.setY(height / 3 * 2 - btnSize / 2);
-                    break;
-                case 5:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 3 - btnSize / 2);
-                    btn1.setY(height / 4 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 3 * 2 - btnSize / 2);
-                    btn2.setY(height / 4 - btnSize / 2);
-                    ///
-                    btn3.setVisibility(View.VISIBLE);
-                    btn3.setX(width / 3 - btnSize / 2);
-                    btn3.setY(height / 4 * 2 - btnSize / 2);
-                    ///
-                    btn4.setVisibility(View.VISIBLE);
-                    btn4.setX(width / 3 * 2 - btnSize / 2);
-                    btn4.setY(height / 4 * 2 - btnSize / 2);
-                    ///
-                    btn5.setVisibility(View.VISIBLE);
-                    btn5.setX(width / 2 - btnSize / 2);
-                    btn5.setY(height / 4 * 3 - btnSize / 2);
-                    break;
-                case 6:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 3 - btnSize / 2);
-                    btn1.setY(height / 4 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 3 * 2 - btnSize / 2);
-                    btn2.setY(height / 4 - btnSize / 2);
-                    ///
-                    btn3.setVisibility(View.VISIBLE);
-                    btn3.setX(width / 3 - btnSize / 2);
-                    btn3.setY(height / 4 * 2 - btnSize / 2);
-                    ///
-                    btn4.setVisibility(View.VISIBLE);
-                    btn4.setX(width / 3 * 2 - btnSize / 2);
-                    btn4.setY(height / 4 * 2 - btnSize / 2);
-                    ///
-                    btn5.setVisibility(View.VISIBLE);
-                    btn5.setX(width / 3 - btnSize / 2);
-                    btn5.setY(height / 4 * 3 - btnSize / 2);
-                    ///
-                    btn6.setVisibility(View.VISIBLE);
-                    btn6.setX(width / 3 * 2 - btnSize / 2);
-                    btn6.setY(height / 4 * 3 - btnSize / 2);
-                    break;
-                case 7:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 3 - btnSize / 2);
-                    btn1.setY(height / 5 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 3 * 2 - btnSize / 2);
-                    btn2.setY(height / 5 - btnSize / 2);
-                    ///
-                    btn3.setVisibility(View.VISIBLE);
-                    btn3.setX(width / 3 - btnSize / 2);
-                    btn3.setY(height / 5 * 2 - btnSize / 2);
-                    ///
-                    btn4.setVisibility(View.VISIBLE);
-                    btn4.setX(width / 3 * 2 - btnSize / 2);
-                    btn4.setY(height / 5 * 2 - btnSize / 2);
-                    ///
-                    btn5.setVisibility(View.VISIBLE);
-                    btn5.setX(width / 3 - btnSize / 2);
-                    btn5.setY(height / 5 * 3 - btnSize / 2);
-                    ///
-                    btn6.setVisibility(View.VISIBLE);
-                    btn6.setX(width / 3 * 2 - btnSize / 2);
-                    btn6.setY(height / 5 * 3 - btnSize / 2);
-                    ///
-                    btn7.setVisibility(View.VISIBLE);
-                    btn7.setX(width / 2 - btnSize / 2);
-                    btn7.setY(height / 5 * 4 - btnSize / 2);
-                    break;
-                case 8:
-                    btn1.setVisibility(View.VISIBLE);
-                    btn1.setX(width / 3 - btnSize / 2);
-                    btn1.setY(height / 5 - btnSize / 2);
-                    ///
-                    btn2.setVisibility(View.VISIBLE);
-                    btn2.setX(width / 3 * 2 - btnSize / 2);
-                    btn2.setY(height / 5 - btnSize / 2);
-                    ///
-                    btn3.setVisibility(View.VISIBLE);
-                    btn3.setX(width / 3 - btnSize / 2);
-                    btn3.setY(height / 5 * 2 - btnSize / 2);
-                    ///
-                    btn4.setVisibility(View.VISIBLE);
-                    btn4.setX(width / 3 * 2 - btnSize / 2);
-                    btn4.setY(height / 5 * 2 - btnSize / 2);
-                    ///
-                    btn5.setVisibility(View.VISIBLE);
-                    btn5.setX(width / 3 - btnSize / 2);
-                    btn5.setY(height / 5 * 3 - btnSize / 2);
-                    ///
-                    btn6.setVisibility(View.VISIBLE);
-                    btn6.setX(width / 3 * 2 - btnSize / 2);
-                    btn6.setY(height / 5 * 3 - btnSize / 2);
-                    ///
-                    btn7.setVisibility(View.VISIBLE);
-                    btn7.setX(width / 3 - btnSize / 2);
-                    btn7.setY(height / 5 * 4 - btnSize / 2);
-                    ///
-                    btn8.setVisibility(View.VISIBLE);
-                    btn8.setX(width / 3 * 2 - btnSize / 2);
-                    btn8.setY(height / 5 * 4 - btnSize / 2);
-                    break;
-
-            }
+        if (nbDoor == 1) {
+            mBtnList.get(0).setVisibility(View.VISIBLE);
+            mBtnList.get(0).setX(width / 2 - btnSize / 2);
+            mBtnList.get(0).setY(height / 2 - btnSize / 2);
         }
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        Log.d("tag", "config changed");
+        super.onConfigurationChanged(newConfig);
+
+        int orientation = newConfig.orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT)
+            Log.d("tag", "Portrait");
+        else if (orientation == Configuration.ORIENTATION_LANDSCAPE)
+            Log.d("tag", "Landscape");
+        else
+            Log.w("tag", "other: " + orientation);
+    }
 }
+
 
 

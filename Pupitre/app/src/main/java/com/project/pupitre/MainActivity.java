@@ -61,17 +61,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-        int a=10;
-        switch (a){
-            case 10:
-                Log.d(TAG, "case 10");
-                a=12;
-                break;
-            case 12:
-                Log.d(TAG, "case 12");
-                break;
-        }
     }
 
     //Displays menu created in menu_main.xml
