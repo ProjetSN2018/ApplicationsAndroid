@@ -5,56 +5,40 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.hardware.Sensor;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.ButtonBarLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.OrientationEventListener;
-import android.view.Surface;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+
 import java.util.ArrayList;
-import java.util.Set;
 
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 
-public class DoorManagementActivity extends Activity {
+public class DoorManagementActivity extends AppCompatActivity {
     /**
      * Tag for Log
      */
     private static final String TAG = "DeviceListActivity";
-    OrientationEventListener myOrientationEventListener;
     DoorManagementActivity doorManagementActivity;
     TextView tvState;
     EditText etNbDoor;
@@ -89,6 +73,12 @@ public class DoorManagementActivity extends Activity {
         btnDraw = (Button) findViewById(R.id.Draw);
         pbLoading = (ProgressBar)findViewById(R.id.progressBar);
 
+        // Setup the toolbar
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar_second);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setTitle("Mode");
+
+        // Add buttons in a button list
         mBtnList.add(btn1);
         mBtnList.add(btn2);
         mBtnList.add(btn3);
@@ -157,7 +147,6 @@ public class DoorManagementActivity extends Activity {
         }
     }
 
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt("pbState", pbLoading.getVisibility());
@@ -182,21 +171,19 @@ public class DoorManagementActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
-
+        String modeName = "";
         switch (id) {
             //"Turn Bluetooth On/Off was clicked
             case R.id.mode1:
-                Toast.makeText(doorManagementActivity, "Mode 1", Toast.LENGTH_LONG).show();
                 break;
             case R.id.mode2:
-                Toast.makeText(doorManagementActivity, "Mode 2", Toast.LENGTH_LONG).show();
                 break;
             case R.id.mode3:
-                Toast.makeText(doorManagementActivity, "Mode 3", Toast.LENGTH_LONG).show();
                 break;
             case R.id.mode4:
-                Toast.makeText(doorManagementActivity, "Mode 4", Toast.LENGTH_LONG).show();
         }
+        modeName = (String) item.getTitle();
+        getSupportActionBar().setTitle(modeName);
         return super.onOptionsItemSelected(item);
     }
 
@@ -308,7 +295,6 @@ public class DoorManagementActivity extends Activity {
 
         int d = 0, i, j, nRow, nCol;
 
-
         DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
         float btnSize = 100 * (metrics.densityDpi / 160f);
 
@@ -361,7 +347,6 @@ public class DoorManagementActivity extends Activity {
                 }
             }
         }
-
         if (nbDoor == 1) {
             mBtnList.get(0).setVisibility(View.VISIBLE);
             mBtnList.get(0).setX(width / 2 - btnSize / 2);
@@ -374,7 +359,6 @@ public class DoorManagementActivity extends Activity {
     {
         Log.d("tag", "config changed");
         super.onConfigurationChanged(newConfig);
-
         int orientation = newConfig.orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT)
             Log.d("tag", "Portrait");
