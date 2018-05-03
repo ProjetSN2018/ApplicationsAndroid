@@ -15,6 +15,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,8 +25,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     MainActivity mainActivity;
     BluetoothAdapter mBtAdapter;
-    Button mkdiscov, btonoff;
+    Button mkdiscov, btonoff, btnInit;
     TextView tvState;
+    EditText etNbDoor;
     private BluetoothDevice mBTDevice;
     private BluetoothChatService mChatService = null;
 
@@ -35,9 +38,10 @@ public class MainActivity extends AppCompatActivity {
         mkdiscov = (Button) findViewById(R.id.mkdiscov);
         btonoff = (Button) findViewById(R.id.btonoff);
         tvState = (TextView) findViewById(R.id.tvState);
+        btnInit = (Button) findViewById(R.id.btnInit);
+        etNbDoor = (EditText) findViewById(R.id.etNbDoor);
 
         mChatService = new BluetoothChatService(mainActivity, mHandler);
-        //mChatService.start();
 
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         btonoff.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +56,19 @@ public class MainActivity extends AppCompatActivity {
                 makeDiscoverable();
             }
         });
+        btnInit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mBtAdapter.isEnabled()){
+                    mChatService.start();
+                    Log.d(TAG, "Initialisation started");
+                    Toast.makeText(getApplicationContext(), "Initialisation started", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Bluetooth must be turned on.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
     //Turn on/off the Bluetooth depending on the actual state
@@ -102,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {
+        @SuppressLint("SetTextI18n")
         @Override
         public void handleMessage(Message msg) {
             Activity activity = mainActivity;
@@ -113,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                             tvState.setText("Not connected");
                             break;
                         case BluetoothChatService.STATE_CONNECTED:
-                            tvState.setText("Connected to " + mBTDevice.getName());
+                            tvState.setText("Connected");
                             break;
                         case BluetoothChatService.STATE_CONNECTING:
                             tvState.setText("Connecting...");
@@ -130,7 +148,14 @@ public class MainActivity extends AppCompatActivity {
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    Toast.makeText(activity, "Read : " + readMessage, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
+
+                    switch (readMessage){
+                        case "Incoming":
+                            //sendMessage();
+                            break;
+                    }
+
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name

@@ -120,7 +120,7 @@ public class DoorManagementActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     Toast.makeText(mContext, "click detected on door "+current, Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "click detected on door "+current);
-                    sendMessage("OD"+i);
+                    sendMessage("OD"+current);
                 }
             });
         }
@@ -226,7 +226,7 @@ public class DoorManagementActivity extends AppCompatActivity {
     }
 
     private void connectDevice(BluetoothDevice mBTDevice, boolean secure) {
-        Log.d(TAG, "///////////////////////////////////////////////////////////////" + mBTDevice.getName() + "\n" + mBTDevice.getAddress());
+        //Log.d(TAG, "//////////////////////" + mBTDevice.getName() + "\n" + mBTDevice.getAddress());
         // Attempt to connect to the device
         mChatService.connect(mBTDevice, false);
     }
@@ -245,6 +245,7 @@ public class DoorManagementActivity extends AppCompatActivity {
                             break;
                         case BluetoothChatService.STATE_CONNECTED:
                             tvState.setText("Connected to " + mBTDevice.getName());
+
                             break;
                         case BluetoothChatService.STATE_CONNECTING:
                             tvState.setText("Connecting...");
@@ -255,7 +256,7 @@ public class DoorManagementActivity extends AppCompatActivity {
                     byte[] writeBuf = (byte[]) msg.obj;
                     // construct a string from the buffer
                     String writeMessage = new String(writeBuf);
-                    Toast.makeText(activity, "write : " + writeMessage, Toast.LENGTH_SHORT).show();
+//                  Toast.makeText(activity, "write : " + writeMessage, Toast.LENGTH_SHORT).show();
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
