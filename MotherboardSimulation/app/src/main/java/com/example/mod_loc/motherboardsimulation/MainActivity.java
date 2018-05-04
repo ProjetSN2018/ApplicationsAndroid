@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(discoverableIntent);
     }
 
+
     @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {
         @SuppressLint("SetTextI18n")
@@ -141,8 +142,6 @@ public class MainActivity extends AppCompatActivity {
                 case Constants.MESSAGE_WRITE:
                     byte[] writeBuf = (byte[]) msg.obj;
                     // construct a string from the buffer
-                    String writeMessage = new String(writeBuf);
-                    Toast.makeText(activity, "write : " + writeMessage, Toast.LENGTH_SHORT).show();
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
@@ -152,7 +151,9 @@ public class MainActivity extends AppCompatActivity {
 
                     switch (readMessage){
                         case "Incoming":
-                            //sendMessage();
+                            String strNbDoor = etNbDoor.getText().toString();
+                            sendMessage("NBD-"+strNbDoor);
+                            Toast.makeText(getApplicationContext(), "NBD-"+strNbDoor, Toast.LENGTH_SHORT).show();
                             break;
                     }
 
@@ -173,7 +174,23 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
         }
+
+        private void sendMessage(String message) {
+            // Check that we're actually connected before trying anything
+            if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+                Toast.makeText(mainActivity.getApplicationContext(), "Not Connected", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // Check that there's actually something to send
+            if (message.length() > 0) {
+                // Get the message bytes and tell the BluetoothChatService to write
+                byte[] send = message.getBytes();
+                mChatService.write(send);
+            }
+        }
     };
+
+
 }
 
 

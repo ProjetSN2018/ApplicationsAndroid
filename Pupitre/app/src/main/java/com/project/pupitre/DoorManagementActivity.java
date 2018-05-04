@@ -41,8 +41,7 @@ public class DoorManagementActivity extends AppCompatActivity {
     private static final String TAG = "DeviceListActivity";
     DoorManagementActivity doorManagementActivity;
     TextView tvState;
-    EditText etNbDoor;
-    Button btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btnDraw;
+    Button btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8;
     ArrayList<Button> mBtnList = new ArrayList<>();
     ProgressBar pbLoading;
     private BluetoothChatService mChatService = null;
@@ -70,7 +69,6 @@ public class DoorManagementActivity extends AppCompatActivity {
         btn6 = (Button) findViewById(R.id.btn6);
         btn7 = (Button) findViewById(R.id.btn7);
         btn8 = (Button) findViewById(R.id.btn8);
-        btnDraw = (Button) findViewById(R.id.Draw);
         pbLoading = (ProgressBar)findViewById(R.id.progressBar);
 
         // Setup the toolbar
@@ -88,7 +86,6 @@ public class DoorManagementActivity extends AppCompatActivity {
         mBtnList.add(btn7);
         mBtnList.add(btn8);
 
-        etNbDoor = (EditText) findViewById(R.id.etNbDoor);
         tvState = (TextView) findViewById(R.id.tvState);
         secondToolbar = findViewById(R.id.toolbar);
         //setSupportActionBar(secondToolbar);
@@ -106,12 +103,6 @@ public class DoorManagementActivity extends AppCompatActivity {
             Toast.makeText(doorManagementActivity, "Bluetooth is not available", Toast.LENGTH_LONG).show();
             doorManagementActivity.finish();
         }
-        btnDraw.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CreateButtons();
-            }
-        });
 
         for (i=0;i<mBtnList.size();i++) {
             final int current = i+1;
@@ -133,7 +124,7 @@ public class DoorManagementActivity extends AppCompatActivity {
                 this, SensorManager.SENSOR_DELAY_NORMAL) {
             @Override
             public void onOrientationChanged(int angle) {
-                if (pbLoading.getVisibility() == View.GONE)CreateButtons();
+                //if (pbLoading.getVisibility() == View.GONE)CreateButtons();
             }
         };
 
@@ -245,7 +236,10 @@ public class DoorManagementActivity extends AppCompatActivity {
                             break;
                         case BluetoothChatService.STATE_CONNECTED:
                             tvState.setText("Connected to " + mBTDevice.getName());
-
+                            int i = 1;
+                            if (i-- == 1) {
+                                sendMessage("Incoming");
+                            }
                             break;
                         case BluetoothChatService.STATE_CONNECTING:
                             tvState.setText("Connecting...");
@@ -257,12 +251,21 @@ public class DoorManagementActivity extends AppCompatActivity {
                     // construct a string from the buffer
                     String writeMessage = new String(writeBuf);
 //                  Toast.makeText(activity, "write : " + writeMessage, Toast.LENGTH_SHORT).show();
+
+
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    Toast.makeText(activity, "Read : " + readMessage, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
+
+
+                    String[] parts = readMessage.split("-");
+
+                    Toast.makeText(getApplicationContext(), parts[1], Toast.LENGTH_SHORT).show();
+                    CreateButtons(Integer.parseInt(parts[1]));
+
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
@@ -280,9 +283,23 @@ public class DoorManagementActivity extends AppCompatActivity {
                     break;
             }
         }
+
+        private void sendMessage(String message){
+            // Check that we're actually connected before trying anything
+            if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+                Toast.makeText(mContext, "Not Connected", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // Check that there's actually something to send
+            if (message.length() > 0) {
+                // Get the message bytes and tell the BluetoothChatService to write
+                byte[] send = message.getBytes();
+                mChatService.write(send);
+            }
+        }
     };
 
-    private void CreateButtons() {
+    private void CreateButtons(int nbDoor) {
         int value;
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -290,9 +307,6 @@ public class DoorManagementActivity extends AppCompatActivity {
         int width = size.x;
         int height = size.y;
         int imp = 0;
-
-        String strNbDoor = etNbDoor.getText().toString();
-        int nbDoor = Integer.parseInt(strNbDoor);
 
         int d = 0, i, j, nRow, nCol;
 
@@ -303,8 +317,6 @@ public class DoorManagementActivity extends AppCompatActivity {
             imp = 1;
         }
 
-        etNbDoor.setVisibility(View.GONE);
-        btnDraw.setVisibility(View.GONE);
         value = this.getResources().getConfiguration().orientation;
 
         if (nbDoor>=1 && nbDoor<=8)pbLoading.setVisibility(View.GONE);
