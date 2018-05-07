@@ -25,9 +25,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     MainActivity mainActivity;
     BluetoothAdapter mBtAdapter;
-    Button mkdiscov, btonoff, btnInit;
+    Button mkdiscov, btonoff, btnInit, btnCall;
     TextView tvState;
-    EditText etNbDoor;
+    EditText etNbDoor, DoorCall;
     private BluetoothDevice mBTDevice;
     private BluetoothChatService mChatService = null;
 
@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
         tvState = (TextView) findViewById(R.id.tvState);
         btnInit = (Button) findViewById(R.id.btnInit);
         etNbDoor = (EditText) findViewById(R.id.etNbDoor);
+        btnCall = (Button) findViewById(R.id.btnCall);
+        DoorCall = (EditText) findViewById(R.id.DoorCall);
 
         mChatService = new BluetoothChatService(mainActivity, mHandler);
 
@@ -69,6 +71,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btnCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String strDoorCall = DoorCall.getText().toString();
+                sendMessage("CD-"+strDoorCall);
+            }
+        });
     }
 
     //Turn on/off the Bluetooth depending on the actual state
@@ -190,6 +199,19 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private void sendMessage(String message) {
+        // Check that we're actually connected before trying anything
+        if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+            Toast.makeText(mainActivity.getApplicationContext(), "Not Connected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // Check that there's actually something to send
+        if (message.length() > 0) {
+            // Get the message bytes and tell the BluetoothChatService to write
+            byte[] send = message.getBytes();
+            mChatService.write(send);
+        }
+    }
 
 }
 

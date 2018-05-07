@@ -3,9 +3,11 @@ package com.project.pupitre;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Point;
@@ -39,6 +41,7 @@ public class DoorManagementActivity extends AppCompatActivity {
      * Tag for Log
      */
     private static final String TAG = "DeviceListActivity";
+    MainActivity mainActivity;
     DoorManagementActivity doorManagementActivity;
     TextView tvState;
     Button btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8;
@@ -109,9 +112,30 @@ public class DoorManagementActivity extends AppCompatActivity {
             mBtnList.get(i).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(mContext, "click detected on door "+current, Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "click detected on door "+current);
-                    sendMessage("OD"+current);
+                    //Toast.makeText(mContext, "click detected on door "+current, Toast.LENGTH_SHORT).show();
+                    //Log.d(TAG, "click detected on door "+current);
+
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    //Yes button clicked
+
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    //No button clicked
+                                    break;
+                            }
+                        }
+                    };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+                    builder.setMessage("Do you want to connect to this device :\n"+((TextView) v).getText()+" ?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
+
+
+                sendMessage("OD"+current);
+                    mBtnList.get(current-1).setBackgroundResource(R.drawable.round_button);
                 }
             });
         }
@@ -224,6 +248,7 @@ public class DoorManagementActivity extends AppCompatActivity {
 
     @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {
+        @SuppressLint("ResourceAsColor")
         @Override
         public void handleMessage(Message msg) {
             Activity activity = doorManagementActivity;
@@ -250,7 +275,7 @@ public class DoorManagementActivity extends AppCompatActivity {
                     byte[] writeBuf = (byte[]) msg.obj;
                     // construct a string from the buffer
                     String writeMessage = new String(writeBuf);
-//                  Toast.makeText(activity, "write : " + writeMessage, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(activity, "write : " + writeMessage, Toast.LENGTH_SHORT).show();
 
 
                     break;
@@ -260,12 +285,20 @@ public class DoorManagementActivity extends AppCompatActivity {
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
 
-
                     String[] parts = readMessage.split("-");
+                    Log.d(TAG, "-"+parts[0]+"-");
 
-                    Toast.makeText(getApplicationContext(), parts[1], Toast.LENGTH_SHORT).show();
-                    CreateButtons(Integer.parseInt(parts[1]));
+                    switch (parts[0]){
+                        case "CD":
+                            int doorcalled = Integer.parseInt(parts[1])-1;
+                            mBtnList.get(doorcalled).setBackgroundResource(R.drawable.round_clicked_button);
+                            break;
 
+                        case "NBD":
+                            Toast.makeText(getApplicationContext(), parts[1], Toast.LENGTH_SHORT).show();
+                            CreateButtons(Integer.parseInt(parts[1]));
+                            break;
+                    }
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
