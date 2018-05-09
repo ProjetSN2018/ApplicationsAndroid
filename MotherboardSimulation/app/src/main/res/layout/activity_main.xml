@@ -43,12 +43,24 @@
         android:id="@+id/btnCall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="32dp"
-        android:layout_marginStart="32dp"
+        android:layout_marginLeft="28dp"
+        android:layout_marginStart="28dp"
         android:layout_marginTop="8dp"
         android:text="Call"
         app:layout_constraintStart_toEndOf="@+id/btnInit"
         app:layout_constraintTop_toBottomOf="@+id/mkdiscov" />
+
+    <Button
+        android:id="@+id/btnMode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Mode"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnInit" />
+
 
     <TextView
         android:id="@+id/tvState"
@@ -90,5 +102,31 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btnCall"
         app:layout_constraintTop_toBottomOf="@+id/etNbDoor" />
+
+    <EditText
+        android:id="@+id/etMode"
+        android:layout_width="215dp"
+        android:layout_height="51dp"
+        android:layout_marginLeft="36dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="12dp"
+        android:ems="10"
+        app:layout_constraintStart_toEndOf="@+id/btnMode"
+        app:layout_constraintTop_toBottomOf="@+id/DoorCall" />
+
+    <TextView
+        android:id="@+id/tvLog"
+        android:layout_width="351dp"
+        android:layout_height="275dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvState"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etMode" />
 
 </android.support.constraint.ConstraintLayout>

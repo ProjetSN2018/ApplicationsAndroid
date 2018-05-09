@@ -61,6 +61,9 @@ public class DoorManagementActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Setup the popup dialog
+        final AlertDialog.Builder adb = new AlertDialog.Builder(this);
+
         // Setup the window
         mContext = this;
         setContentView(R.layout.activity_door_management);
@@ -112,30 +115,27 @@ public class DoorManagementActivity extends AppCompatActivity {
             mBtnList.get(i).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Toast.makeText(mContext, "click detected on door "+current, Toast.LENGTH_SHORT).show();
-                    //Log.d(TAG, "click detected on door "+current);
+                    //Toast.makeText(mContext, "click detected on door "+current, Toast.LENGTH_SHORT).show();//Log.d(TAG, "click detected on door "+current);
 
-                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which){
-                                case DialogInterface.BUTTON_POSITIVE:
-                                    //Yes button clicked
-
-                                    break;
-
-                                case DialogInterface.BUTTON_NEGATIVE:
-                                    //No button clicked
-                                    break;
-                            }
+                    adb.setTitle("Confirm opening");
+                    adb.setMessage("Do you really want to open door "+ current +" ?");
+                    adb.setNegativeButton("No", new AlertDialog.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int arg1) {
+                            Toast.makeText(getApplicationContext(), "Access denied", Toast.LENGTH_SHORT).show();
+                            sendMessage("AD-"+current);
+                            mBtnList.get(current-1).setBackgroundResource(R.drawable.round_button);
                         }
-                    };
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
-                    builder.setMessage("Do you want to connect to this device :\n"+((TextView) v).getText()+" ?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
+                    });
+                    adb.setPositiveButton("Yes, Open", new AlertDialog.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int arg1) {
+                            Toast.makeText(getApplicationContext(), "Opening door " + current, Toast.LENGTH_SHORT).show();
+                            sendMessage("OD-"+current);
+                            mBtnList.get(current-1).setBackgroundResource(R.drawable.round_button);
 
+                        }
+                    });
+                    adb.show();
 
-                sendMessage("OD"+current);
-                    mBtnList.get(current-1).setBackgroundResource(R.drawable.round_button);
                 }
             });
         }
@@ -186,19 +186,25 @@ public class DoorManagementActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
-        String modeName = "";
+        String mode = "";
         switch (id) {
             //"Turn Bluetooth On/Off was clicked
             case R.id.mode1:
+                mode = "A";
                 break;
             case R.id.mode2:
+                mode = "M";
                 break;
             case R.id.mode3:
+                mode = "SA";
                 break;
             case R.id.mode4:
+                mode = "C";
+                break;
+            default:
+                break;
         }
-        modeName = (String) item.getTitle();
-        getSupportActionBar().setTitle(modeName);
+        sendMessage("MD-"+mode);
         return super.onOptionsItemSelected(item);
     }
 
@@ -286,7 +292,6 @@ public class DoorManagementActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
 
                     String[] parts = readMessage.split("-");
-                    Log.d(TAG, "-"+parts[0]+"-");
 
                     switch (parts[0]){
                         case "CD":
@@ -295,10 +300,47 @@ public class DoorManagementActivity extends AppCompatActivity {
                             break;
 
                         case "NBD":
-                            Toast.makeText(getApplicationContext(), parts[1], Toast.LENGTH_SHORT).show();
                             CreateButtons(Integer.parseInt(parts[1]));
+                            switch (parts[2]) {
+                                case "A":
+                                    getSupportActionBar().setTitle("Automatic");
+                                    break;
+                                case "C":
+                                    getSupportActionBar().setTitle("Closed");
+                                    break;
+                                case "SA":
+                                    getSupportActionBar().setTitle("Semi-Automatic");
+                                    break;
+                                case "M":
+                                    getSupportActionBar().setTitle("Manuel");
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+                        case "MD":
+                            switch (parts[1]) {
+                                case "A":
+                                    getSupportActionBar().setTitle("Automatic");
+                                    break;
+                                case "C":
+                                    getSupportActionBar().setTitle("Closed");
+                                    break;
+                                case "SA":
+                                    getSupportActionBar().setTitle("Semi-Automatic");
+                                    break;
+                                case "M":
+                                    getSupportActionBar().setTitle("Manuel");
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+
+                        default:
                             break;
                     }
+
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name

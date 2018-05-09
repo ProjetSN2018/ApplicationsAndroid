@@ -1,8 +1,10 @@
 package com.project.pupitre;
 
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
@@ -19,11 +21,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG ="MainActivity";
 
-    //MainActivity mainActivity;
     Button btnConnexion;
     Toolbar toolbar;
     BluetoothAdapter mBtAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +41,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Connection clicked");
-                //Toast.makeText(getApplicationContext(), "Connection", Toast.LENGTH_SHORT).show();
+
                 //Check if bluetooth is enabled before starting connexion
                 if(mBtAdapter.isEnabled()){
+                    //Bluetooth is enabled, starting DeviceListActivity
                     Intent DeviceListIntent = new Intent(MainActivity.this, DeviceListActivity.class);
                     startActivity(DeviceListIntent);
                 }else{
+                    //Bluetooth is disabled
                     Toast.makeText(getApplicationContext(), "Bluetooth must be turned on.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -67,10 +69,11 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         switch(id){
-            //"Turn Bluetooth On/Off was clicked
+            //Turn Bluetooth On/Off is clicked
             case R.id.bluetoothOnOff:
                 enableDisableBT();
                 break;
+            //Make discoverable is clicked
             case R.id.makeDiscoverable:
                 makeDiscoverable();
                 break;
@@ -97,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Make the device discoverable by other bluetooth devices for 5 mins
     public void makeDiscoverable(){
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);

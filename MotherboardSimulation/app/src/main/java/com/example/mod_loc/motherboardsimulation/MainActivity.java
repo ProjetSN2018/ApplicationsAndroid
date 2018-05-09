@@ -25,9 +25,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     MainActivity mainActivity;
     BluetoothAdapter mBtAdapter;
-    Button mkdiscov, btonoff, btnInit, btnCall;
-    TextView tvState;
-    EditText etNbDoor, DoorCall;
+    Button mkdiscov, btonoff, btnInit, btnCall,btnMode;
+    TextView tvState,tvLog;
+    EditText etNbDoor, DoorCall, etMode;
     private BluetoothDevice mBTDevice;
     private BluetoothChatService mChatService = null;
 
@@ -42,10 +42,21 @@ public class MainActivity extends AppCompatActivity {
         etNbDoor = (EditText) findViewById(R.id.etNbDoor);
         btnCall = (Button) findViewById(R.id.btnCall);
         DoorCall = (EditText) findViewById(R.id.DoorCall);
-
+        btnMode = (Button) findViewById(R.id.btnMode);
+        etMode = (EditText) findViewById(R.id.etMode);
+        tvLog = (TextView) findViewById(R.id.tvLog);
         mChatService = new BluetoothChatService(mainActivity, mHandler);
 
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
+        btnMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String strMode = etMode.getText().toString();
+                sendMessage("MD-"+strMode);
+                tvLog.append("Switch to "+strMode+" mode\n");
+            }
+        });
+
         btonoff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String strDoorCall = DoorCall.getText().toString();
                 sendMessage("CD-"+strDoorCall);
+                tvLog.append("Simulate call on door "+strDoorCall+"\n");
             }
         });
     }
@@ -161,11 +173,29 @@ public class MainActivity extends AppCompatActivity {
                     switch (readMessage){
                         case "Incoming":
                             String strNbDoor = etNbDoor.getText().toString();
-                            sendMessage("NBD-"+strNbDoor);
-                            Toast.makeText(getApplicationContext(), "NBD-"+strNbDoor, Toast.LENGTH_SHORT).show();
+                            String strMode = etMode.getText().toString();
+
+                            sendMessage("NBD-"+strNbDoor+"-"+strMode);
+                            tvLog.append("Establishing connection with "+strNbDoor+" doors and "+strMode+" mode\n");
+
                             break;
                     }
+                    String[] parts = readMessage.split("-");
 
+                    switch (parts[0]){
+                        case "MD":
+                            sendMessage("MD-"+parts[1]);
+                            tvLog.append("Switch to "+parts[1]+" mode\n");
+                            break;
+                        case "AD":
+                            tvLog.append("Access denied at door "+parts[1]+"\n");
+                            break;
+                        case "OD":
+                            tvLog.append("Access granted at door "+parts[1]+"\n");
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
