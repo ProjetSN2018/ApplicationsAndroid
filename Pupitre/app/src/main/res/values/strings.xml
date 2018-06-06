@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">Desk</string>
-    <string name="connection">Connection</string>
+
 
     <!--  DeviceListActivity -->
     <string name="scanning">scanning for devices...</string>
@@ -11,5 +10,39 @@
     <string name="device_state">State : </string>
     <string name="title_other_devices">Other Available Devices</string>
     <string name="button_scan">Scan for devices</string>
+
+    <!--  MainActivity -->
+    <string name="app_name">Desk</string>
+    <string name="connection">Connection</string>
+    <string name="bt_on_off">Turn Bluetooth On/Off</string>
+    <string name="make_discoverable">Make discoverable</string>
+    <string name="bluetooth_must_be_turned_on">Bluetooth must be turned on.</string>
+    <string name="bluetooth_disable">Bluetooth has been disabled.</string>
+    <string name="bluetooth_enable">Bluetooth has been enabled.</string>
+
+
+    <!--  DoorManagementActivity -->
+    <!--  Buttons -->
+    <string name="door1">Door 1</string>
+    <string name="door2">Door 2</string>
+    <string name="door3">Door 3</string>
+    <string name="door4">Door 4</string>
+    <string name="door5">Door 5</string>
+    <string name="door6">Door 6</string>
+    <string name="door7">Door 7</string>
+    <string name="door8">Door 8</string>
+
+    <!--  Connection state -->
+    <string name="not_connected">Not connected</string>
+    <string name="connected_to">Connected to </string>
+    <string name="connecting">Connecting...</string>
+
+    <!--  Pop-up -->
+    <string name="title">Confirm opening</string>
+    <string name="text">Do you want to open door</string>
+    <string name="access_denied">Access denied</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="opening_door">Opening door</string>
 
 </resources>

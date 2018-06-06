@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pupitre</string>
+    <string name="connection">Connexion</string>
+    <string name="bluetooth_enable">Le Bluetooth a été activé.</string>
+    <string name="bluetooth_disable">Le Bluetooth a été désactivé.</string>
+    <string name="bluetooth_must_be_turned_on">Le Bluetooth doit être activé.</string>
+    <string name="button_scan">Rechercher des périphériques</string>
+    <string name="title_other_devices">Autres périphériques disponibles</string>
+    <string name="device_state">Etat :</string>
+    <string name="title_paired_devices">Périphériques appairés</string>
+    <string name="none_found">Aucun périphérique trouvé</string>
+    <string name="none_paired">Aucun périphérique appairé</string>
+    <string name="select_device">Selectionez un periphérique pour vous connecter</string>
+    <string name="scanning">Recherche de périphériques</string>
+    <string name="bt_on_off">Activé/Désactivé le Bluetooth</string>
+    <string name="make_discoverable">Rendre l\'appareil visible</string>
+    <string name="door1">Porte 1</string>
+    <string name="door2">Porte 2</string>
+    <string name="door3">Porte 3</string>
+    <string name="door4">Porte 4</string>
+    <string name="door5">Porte 5</string>
+    <string name="door6">Porte 6</string>
+    <string name="door7">Porte 7</string>
+    <string name="door8">Porte 8</string>
+    <string name="title">Confirmation d'ouverture</string>
+    <string name="text">Voulez vous ouvrir la porte</string>
+    <string name="access_denied">Accès refusé</string>
+    <string name="no">Non</string>
+    <string name="yes">Oui</string>
+    <string name="opening_door">Ouverture de la porte</string>
+    <string name="not_connected">Non connecté</string>
+    <string name="connected_to">Connecté à </string>
+    <string name="connecting">Connexion...</string>
+
+</resources>

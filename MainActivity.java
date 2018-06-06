@@ -1,11 +1,10 @@
-package com.project.pupitre;
+﻿package com.project.pupitre;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
@@ -14,15 +13,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
+
+C'est super
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG ="MainActivity";
 
     Button btnConnexion;
-    ImageButton btnLogo;
     Toolbar toolbar;
     BluetoothAdapter mBtAdapter;
 
@@ -33,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
         //////////////////////////////////////////////
         btnConnexion = (Button) findViewById(R.id.btn_connexion);
-        btnLogo = (ImageButton) findViewById(R.id.btnLogo);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         setSupportActionBar(toolbar);
@@ -58,14 +56,6 @@ public class MainActivity extends AppCompatActivity {
                     // Le Bluetooth est désactivé, notifie l'utilisateur d'activé le Bluetooth
                     Toast.makeText(getApplicationContext(), R.string.bluetooth_must_be_turned_on, Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
-
-        btnLogo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.a-2-s.net"));
-                startActivity(browserIntent);
             }
         });
     }

@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="Turn Bluetooth On/Off"
+        android:title="@string/bt_on_off"
         android:id="@+id/bluetoothOnOff"/>
     <item
-        android:title="Make discoverable"
+        android:title="@string/make_discoverable"
         android:id="@+id/makeDiscoverable"/>
 </menu>

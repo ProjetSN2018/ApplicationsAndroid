@@ -46,7 +46,8 @@ public class DeviceListActivity extends Activity {
     // Member fields
     private BluetoothAdapter mBtAdapter;
 
-    //Newly discovered devices
+    // Newly discovered devices
+    // Appareils découverts lors de la recherche
     private ArrayAdapter<String> mNewDevicesArrayAdapter;
 
     public ArrayList<String> mBTDevices = new ArrayList<>();
@@ -61,13 +62,16 @@ public class DeviceListActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         // Setup the window
+        // Mise en place de la fenètre
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_device_list);
 
         // Set result CANCELED in case the user backs out
+        // Met le resultat à CANCELED en cas de retour de l'utilisateur
         setResult(Activity.RESULT_CANCELED);
 
         // Initialize the button to perform device discovery
+        // Initialisation du bouton pour lancer la recherche d'appareil
         Button scanButton = (Button) findViewById(R.id.button_scan);
         scanButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -76,40 +80,46 @@ public class DeviceListActivity extends Activity {
             }
         });
 
-        // Initialize array adapters. One for already paired devices and
-        // one for newly discovered devices
+        // Initialize array adapters. One for already paired devices and one for newly discovered devices
+        // Initialise les array adapters. Un pour les appareils déja appairés et un autre pour les nouveuax appareils découverts
         pairedDevicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.device_name);
         mNewDevicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.device_name);
 
         // Find and set up the ListView for paired devices
+        // Recherche et initialise la ListView pour les appareils appairé
         pairedListView = (ListView) findViewById(R.id.paired_devices);
         pairedListView.setAdapter(pairedDevicesArrayAdapter);
         pairedListView.setOnItemClickListener(mDeviceClickListener);
 
         // Find and set up the ListView for newly discovered devices
+        // Recherche et initialise la ListView pour les nouveaux appareils
         newDevicesListView = (ListView) findViewById(R.id.new_devices);
         newDevicesListView.setAdapter(mNewDevicesArrayAdapter);
         newDevicesListView.setOnItemClickListener(mDeviceClickListener);
 
         // Register for broadcasts when a device is discovered
+        // Enregistrement de la diffusion quand un appareil est découvert
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         this.registerReceiver(mReceiver, filter);
 
         // Register for broadcasts when discovery has finished
+        // Enregistrement de la diffusion quand la recherche est terminée
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         this.registerReceiver(mReceiver, filter);
 
         // Get the local Bluetooth adapter
+        // Récupère le Bluetooth adapter local
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // Get a set of currently paired devices
+        // Récupère la liste des appareils déja appairée
         Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
 
         // If there are paired devices, add each one to the ArrayAdapter
+        // Si il y a des appareils appairés, les ajoutes dans l'ArrayAdapter
         if (pairedDevices.size() > 0) {
             findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);
             for (BluetoothDevice device : pairedDevices) {
-//                pairedDevices.add(device);
                 pairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
             }
         } else {
@@ -123,6 +133,7 @@ public class DeviceListActivity extends Activity {
         super.onDestroy();
 
         // Make sure we're not doing discovery anymore
+        // Verifie si on n'est plus en etat de recherche
         if (mBtAdapter != null) {
             mBtAdapter.cancelDiscovery();
         }
@@ -143,28 +154,34 @@ public class DeviceListActivity extends Activity {
         Log.d(TAG, "btnDiscover: Looking for unpaired devices.");
 
         // Indicate scanning in the title
+        // Indique que la recherche est en cours dans le titre
         setProgressBarIndeterminateVisibility(true);
         setTitle(R.string.scanning);
 
         // Turn on sub-title for new devices
+        // Activation des sous-titres pour les nouveaux appareils
         findViewById(R.id.title_new_devices).setVisibility(View.VISIBLE);
 
-        //If the device is already discovering, stop the discovery
+        // If the device is already discovering, stop the discovery
+        // Si l'appareil est déja en recherche, arrete la recherche.
         if (mBtAdapter.isDiscovering()) {
             Toast.makeText(getApplicationContext(), "Is discovering", Toast.LENGTH_SHORT).show();
 
             mBtAdapter.cancelDiscovery();
             Log.d(TAG, "btnDiscover: Canceling discovery.");
 
-            //check BT permissions in manifest
+            // check BT permissions in manifest
+            // Vérification des permissions dans le manifest
             mBtAdapter.startDiscovery();
 
             IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
             registerReceiver(mReceiver, discoverDevicesIntent);
         }
-        //If the device isn't discovering, start discovery
+        // If the device isn't discovering, start discovery
+        // Si l'appareil n'est pas en recherche, démarre une recherche.
         if (!mBtAdapter.isDiscovering()) {
             //check BT permissions in manifest
+            // Vérification des permissions dans le manifest
             checkBTPermissions();
             mBtAdapter.startDiscovery();
             Log.d(TAG, "startDiscovery");
@@ -180,16 +197,17 @@ public class DeviceListActivity extends Activity {
     private AdapterView.OnItemClickListener mDeviceClickListener
             = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
-            Log.d(TAG, "----------------------------------onItemClick()");
             // Cancel discovery because it's costly and we're about to connect
+            // Arret de la recherche car elle est gourmande en ressource et la connexion va etre établie
             mBtAdapter.cancelDiscovery();
-            // BluetoothDevice device = mBTDevicesList.get(arg2);
             // Get the device MAC address, which is the last 17 chars in the View
-
+            // Récupère l'adresse MAC de l'appareil, qui correspond au 17 derniers caractères de la vue
             String info = ((TextView) v).getText().toString();
             // Create the result Intent and include the MAC address
+            // Création du résultat de l'Intent et inclue l'adresse MAC
 
             // If clicked item is not a device
+            // Si l'objet cliqué n'est pas un appareil
             if      ((info == getResources().getText(R.string.none_found).toString())||
                     (info == getResources().getText(R.string.none_paired).toString()))
             {
@@ -220,19 +238,21 @@ public class DeviceListActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             // A device have been found
+            // Un appareil a été découvert
             if (action.equals(BluetoothDevice.ACTION_FOUND)) {
                 Log.d(TAG, "onReceive : ACTION FOUND.");
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Check if the device has already been added to the ListView
+                // Vérifie si l'appareil a déja été ajouté dans la ListView
                 if (!mBTDevices.contains(device.getName()+"\n"+device.getAddress())) {
                     mBTDevices.add(device.getName() + "\n" + device.getAddress());
                     mBTDevicesList.add(device);
                     String strDevice = (device.getName() + "\n" + device.getAddress());
                     mNewDevicesArrayAdapter.add(strDevice);
-                    //Toast.makeText(getApplicationContext(), device.getName() + "\n" + device.getAddress(), Toast.LENGTH_SHORT).show();
                 }
             }
             // If no devices have been found after the discovery stopped display that no devices have been found
+            // Si aucun appareil n'a été découvert lors de la recherche, affiche qu'aucun appareil n'a été trouvé.
             else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 setProgressBarIndeterminateVisibility(false);
                 setTitle(R.string.select_device);

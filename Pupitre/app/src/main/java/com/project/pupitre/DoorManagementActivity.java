@@ -3,6 +3,8 @@ package com.project.pupitre;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -12,9 +14,11 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -30,11 +34,15 @@ import android.widget.Toast;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
+import static com.project.pupitre.BuildConfig.DEBUG;
+import static com.project.pupitre.R.raw.notif;
 
 public class DoorManagementActivity extends AppCompatActivity {
     /**
@@ -43,7 +51,7 @@ public class DoorManagementActivity extends AppCompatActivity {
     private static final String TAG = "DeviceListActivity";
     MainActivity mainActivity;
     DoorManagementActivity doorManagementActivity;
-    TextView tvState;
+    TextView tvState,tvNbDoor;
     Button btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8;
     ArrayList<Button> mBtnList = new ArrayList<>();
     ProgressBar pbLoading;
@@ -78,6 +86,7 @@ public class DoorManagementActivity extends AppCompatActivity {
         pbLoading = (ProgressBar)findViewById(R.id.progressBar);
 
         // Setup the toolbar
+        // Mise en place de la barre de menu
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar_second);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setTitle("Mode");
@@ -93,8 +102,8 @@ public class DoorManagementActivity extends AppCompatActivity {
         mBtnList.add(btn8);
 
         tvState = (TextView) findViewById(R.id.tvState);
+        tvNbDoor = (TextView)findViewById(R.id.tvNbDoor);
         secondToolbar = findViewById(R.id.toolbar);
-        //setSupportActionBar(secondToolbar);
 
         // Get the info from the previous activity
         mBTDevice = getIntent().getExtras().getParcelable("device");
@@ -115,23 +124,22 @@ public class DoorManagementActivity extends AppCompatActivity {
             mBtnList.get(i).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Toast.makeText(mContext, "click detected on door "+current, Toast.LENGTH_SHORT).show();//Log.d(TAG, "click detected on door "+current);
 
-                    adb.setTitle("Confirm opening");
-                    adb.setMessage("Do you really want to open door "+ current +" ?");
-                    adb.setNegativeButton("No", new AlertDialog.OnClickListener() {
+                    String text = getString(R.string.text);
+                    adb.setTitle(R.string.title);
+                    adb.setMessage(text + " " +current +" ?");
+                    adb.setNegativeButton(R.string.no, new AlertDialog.OnClickListener() {
                         public void onClick(DialogInterface dialog, int arg1) {
-                            Toast.makeText(getApplicationContext(), "Access denied", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), R.string.access_denied, Toast.LENGTH_SHORT).show();
                             sendMessage("AD-"+current);
                             mBtnList.get(current-1).setBackgroundResource(R.drawable.round_button);
                         }
                     });
-                    adb.setPositiveButton("Yes, Open", new AlertDialog.OnClickListener() {
+                    adb.setPositiveButton(R.string.yes, new AlertDialog.OnClickListener() {
                         public void onClick(DialogInterface dialog, int arg1) {
-                            Toast.makeText(getApplicationContext(), "Opening door " + current, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), R.string.opening_door + current, Toast.LENGTH_SHORT).show();
                             sendMessage("OD-"+current);
                             mBtnList.get(current-1).setBackgroundResource(R.drawable.round_button);
-
                         }
                     });
                     adb.show();
@@ -142,13 +150,10 @@ public class DoorManagementActivity extends AppCompatActivity {
 
         // Get device default display
         //final Display display = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
-
-        // Called when
         orientationListener = new OrientationEventListener(
                 this, SensorManager.SENSOR_DELAY_NORMAL) {
             @Override
             public void onOrientationChanged(int angle) {
-                //if (pbLoading.getVisibility() == View.GONE)CreateButtons();
             }
         };
 
@@ -188,7 +193,6 @@ public class DoorManagementActivity extends AppCompatActivity {
         int id = item.getItemId();
         String mode = "";
         switch (id) {
-            //"Turn Bluetooth On/Off was clicked
             case R.id.mode1:
                 mode = "A";
                 break;
@@ -238,6 +242,7 @@ public class DoorManagementActivity extends AppCompatActivity {
             Toast.makeText(mContext, "Not Connected", Toast.LENGTH_SHORT).show();
             return;
         }
+
         // Check that there's actually something to send
         if (message.length() > 0) {
             // Get the message bytes and tell the BluetoothChatService to write
@@ -254,26 +259,32 @@ public class DoorManagementActivity extends AppCompatActivity {
 
     @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {
-        @SuppressLint("ResourceAsColor")
+        @SuppressLint({"ResourceAsColor", "WrongConstant"})
         @Override
         public void handleMessage(Message msg) {
+
             Activity activity = doorManagementActivity;
+
+            // Set up notification sound
+            final MediaPlayer notifMP = MediaPlayer.create(getApplicationContext(), notif);
+
             switch (msg.what) {
                 case Constants.MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case BluetoothChatService.STATE_LISTEN:
                         case BluetoothChatService.STATE_NONE:
-                            tvState.setText("Not connected");
+                            tvState.setText(R.string.not_connected);
                             break;
                         case BluetoothChatService.STATE_CONNECTED:
-                            tvState.setText("Connected to " + mBTDevice.getName());
+                            String text = getString(R.string.connected_to);
+                            tvState.setText(text + mBTDevice.getName());
                             int i = 1;
                             if (i-- == 1) {
                                 sendMessage("Incoming");
                             }
                             break;
                         case BluetoothChatService.STATE_CONNECTING:
-                            tvState.setText("Connecting...");
+                            tvState.setText(R.string.connecting);
                             break;
                     }
                     break;
@@ -296,7 +307,18 @@ public class DoorManagementActivity extends AppCompatActivity {
                     switch (parts[0]){
                         case "CD":
                             int doorcalled = Integer.parseInt(parts[1])-1;
+
+                            // Bring the application to front when it's in the background.
+                            ActivityManager activityManager = (ActivityManager) getApplicationContext()
+                                    .getSystemService(Context.ACTIVITY_SERVICE);
+                            activityManager.moveTaskToFront(getTaskId(), 0);
+                            activityManager.moveTaskToFront(getTaskId(), 0);
+
                             mBtnList.get(doorcalled).setBackgroundResource(R.drawable.round_clicked_button);
+                            notifMP.start();
+                            android.view.animation.Animation shake = android.view.animation.AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shake);
+                            mBtnList.get(doorcalled).startAnimation(shake);
+
                             break;
 
                         case "NBD":
@@ -336,6 +358,11 @@ public class DoorManagementActivity extends AppCompatActivity {
                                     break;
                             }
                             break;
+                        case"AM":
+                            for (i=1;i<parts.length;i++)
+                            {
+                                getActionBar().
+                            }
 
                         default:
                             break;
@@ -376,13 +403,14 @@ public class DoorManagementActivity extends AppCompatActivity {
 
     private void CreateButtons(int nbDoor) {
         int value;
+        String strDoor = Integer.toString(nbDoor);
+        tvNbDoor.setText(strDoor);
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         int width = size.x;
         int height = size.y;
         int imp = 0;
-
         int d = 0, i, j, nRow, nCol;
 
         DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
@@ -443,17 +471,19 @@ public class DoorManagementActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig)
-    {
-        Log.d("tag", "config changed");
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        int orientation = newConfig.orientation;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT)
-            Log.d("tag", "Portrait");
-        else if (orientation == Configuration.ORIENTATION_LANDSCAPE)
-            Log.d("tag", "Landscape");
-        else
-            Log.w("tag", "other: " + orientation);
+
+        int nbDoor = Integer.parseInt(tvNbDoor.getText().toString());
+
+        // Checks the orientation of the screen
+        if (pbLoading.getVisibility() == View.GONE) {
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                CreateButtons(nbDoor);
+            } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                CreateButtons(nbDoor);
+            }
+        }
     }
 }
 
