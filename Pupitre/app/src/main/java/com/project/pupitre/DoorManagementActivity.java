@@ -255,7 +255,7 @@ public class DoorManagementActivity extends AppCompatActivity {
         //Log.d(TAG, "//////////////////////" + mBTDevice.getName() + "\n" + mBTDevice.getAddress());
         // Attempt to connect to the device
         mChatService.connect(mBTDevice, false);
-    }
+        }
 
     @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {
@@ -308,11 +308,12 @@ public class DoorManagementActivity extends AppCompatActivity {
                         case "CD":
                             int doorcalled = Integer.parseInt(parts[1])-1;
 
+
+
                             // Bring the application to front when it's in the background.
                             ActivityManager activityManager = (ActivityManager) getApplicationContext()
                                     .getSystemService(Context.ACTIVITY_SERVICE);
-                            activityManager.moveTaskToFront(getTaskId(), 0);
-                            activityManager.moveTaskToFront(getTaskId(), 0);
+                            activityManager.moveTaskToFront(getTaskId(), -1);
 
                             mBtnList.get(doorcalled).setBackgroundResource(R.drawable.round_clicked_button);
                             notifMP.start();
@@ -323,6 +324,7 @@ public class DoorManagementActivity extends AppCompatActivity {
 
                         case "NBD":
                             CreateButtons(Integer.parseInt(parts[1]));
+                            Log.d(TAG, "Nombre de porte: "+Integer.parseInt(parts[1])+", mode :"+parts[2]);
                             switch (parts[2]) {
                                 case "A":
                                     getSupportActionBar().setTitle("Automatic");
@@ -361,7 +363,7 @@ public class DoorManagementActivity extends AppCompatActivity {
                         case"AM":
                             for (i=1;i<parts.length;i++)
                             {
-                                getActionBar().
+                                //test
                             }
 
                         default:
@@ -410,8 +412,7 @@ public class DoorManagementActivity extends AppCompatActivity {
         display.getSize(size);
         int width = size.x;
         int height = size.y;
-        int imp = 0;
-        int d = 0, i, j, nRow, nCol;
+        int imp = 0,d = 0, i, j, nRow, nCol;
 
         DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
         float btnSize = 100 * (metrics.densityDpi / 160f);
@@ -424,49 +425,51 @@ public class DoorManagementActivity extends AppCompatActivity {
 
         if (nbDoor>=1 && nbDoor<=8)pbLoading.setVisibility(View.GONE);
 
-        if (value == ORIENTATION_PORTRAIT) {
-            nCol = (nbDoor == 1) ? 1 : 2;
-            nRow = (nbDoor / nCol);
-
-            if (nbDoor != 1) {
-                for (i = 0; i < nRow; i++) {
-                    for (j = 0; j < nCol; j++) {
-                        mBtnList.get(d).setVisibility(View.VISIBLE);
-                        mBtnList.get(d).setX(width / 3 * (j + 1) - btnSize / 2);
-                        mBtnList.get(d).setY(height / (nRow + 1 + imp) * (i + 1) - btnSize / 2);
-                        d++;
-                    }
-                }
-                if (nbDoor % 2 == 1) {
-                    mBtnList.get(d).setVisibility(View.VISIBLE);
-                    mBtnList.get(d).setX((width / 2) - btnSize / 2);
-                    mBtnList.get(d).setY(height / (nRow + 1) * i + 1);
-                }
-            }
-        }
-
-        if (value == ORIENTATION_LANDSCAPE) {
-            nRow = (nbDoor <= 3) ? 1 : 2;
-            if (nbDoor == 3) {
-                nCol = 3;
-            } else {
-                nCol = (nRow == 1) ? nbDoor : nbDoor / 2;
-            }
-            if (nbDoor != 1) {
-                for (i = 0; i < nRow; i++) {
-                    for (j = 0; j < nCol + ((nbDoor == 3) ? 0 : imp) - ((imp == 1 && i == 1) ? 1 : 0); j++) {
-                        mBtnList.get(d).setVisibility(View.VISIBLE);
-                        mBtnList.get(d).setX(width / (nCol + 1 + ((nbDoor == 3) ? 0 : imp)) * (j + 1) - btnSize / 2 + ((imp == 1) ? (i * (width / (nCol + 1 + ((nbDoor == 3) ? 0 : imp)))) / 2 : 0));
-                        mBtnList.get(d).setY(height / (nRow + 1) * (i + 1) - btnSize / 2);
-                        d++;
-                    }
-                }
-            }
-        }
         if (nbDoor == 1) {
             mBtnList.get(0).setVisibility(View.VISIBLE);
             mBtnList.get(0).setX(width / 2 - btnSize / 2);
             mBtnList.get(0).setY(height / 2 - btnSize / 2);
+        }
+        else {
+            if (value == ORIENTATION_PORTRAIT) {
+
+                nCol = (nbDoor <= 3) ? 1 : 2;
+                nRow = (nbDoor <= 3) ? nbDoor : nbDoor / 2;
+
+                if (nbDoor != 1) {
+                    for (i = 0; i < nRow; i++) {
+                        for (j = 0; j < nCol; j++) {
+                            mBtnList.get(d).setVisibility(View.VISIBLE);
+                            mBtnList.get(d).setX(width / (1 + nCol ) * (j + 1) - btnSize / 2);
+                            mBtnList.get(d).setY(height /(1 +((nbDoor == 3) ? 0 : imp)+nRow)*(i+1) - btnSize / 2);
+                            d++;
+                        }
+                    }
+                }
+                if (imp == 1 && nbDoor != 3 && nbDoor != 1){
+                    mBtnList.get(d).setVisibility(View.VISIBLE);
+                    mBtnList.get(d).setX(width / 2 - btnSize/2);
+                    mBtnList.get(d).setY(height / ((nbDoor == 5)? 4:5)*((nbDoor == 5)? 3:4) - btnSize/2);
+                }
+            }
+            if (value == ORIENTATION_LANDSCAPE) {
+                nRow = (nbDoor <= 3) ? 1 : 2;
+                if (nbDoor == 3) {
+                    nCol = 3;
+                } else {
+                    nCol = (nRow == 1) ? nbDoor : nbDoor / 2;
+                }
+                if (nbDoor != 1) {
+                    for (i = 0; i < nRow; i++) {
+                        for (j = 0; j < nCol + ((nbDoor == 3) ? 0 : imp) - ((imp == 1 && i == 1) ? 1 : 0); j++) {
+                            mBtnList.get(d).setVisibility(View.VISIBLE);
+                            mBtnList.get(d).setX(width / (nCol + 1 + ((nbDoor == 3) ? 0 : imp)) * (j + 1) - btnSize / 2 + ((imp == 1) ? (i * (width / (nCol + 1 + ((nbDoor == 3) ? 0 : imp)))) / 2 : 0));
+                            mBtnList.get(d).setY(height / (nRow + 1) * (i + 1) - btnSize / 2);
+                            d++;
+                        }
+                    }
+                }
+            }
         }
     }
 
